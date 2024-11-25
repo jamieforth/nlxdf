@@ -270,28 +270,35 @@ class NlXdf(Xdf):
         return nl_id
 
     @XdfDecorators.loaded
-    def plot_data(self, *stream_ids, exclude=[], cols=None):
+    def plot_data(self, *stream_ids, exclude=[], cols=None, subplots=False):
         data = self.data(*stream_ids,
                          exclude=exclude,
                          cols=cols,
                          with_stream_id=True)
         with mpl.rc_context({'axes.prop_cycle':
                              plt.cycler('color', plt.cm.tab20.colors)}):
-            fig, ax = plt.subplots(1)
-            for stream_id, df in data.items():
+            n = len(data)
+            if n > 1 and subplots:
+                fig, axes = plt.subplots(n,
+                                         figsize=(6, 4 * (0.5 * n)),
+                                         sharex=True,
+                                         sharey=True)
+            else:
+                fig, ax = plt.subplots(1)
+                axes = [ax]
+            for (stream_id, df), i in zip(data.items(), range(n)):
                 df = pd.concat({stream_id: df}, axis=1)
+                ax = axes[i % len(axes)]
                 df.plot(ax=ax)
+                ax.legend(bbox_to_anchor=(1, 1), loc=2)
             title = 'XDF data'
             title = format_title(title, df)
-            ax.set_title(title)
-            ax.text(x=1.0, y=1.0, s=format_load_params(df), fontsize=7,
-                    transform=ax.transAxes,
-                    horizontalalignment='left',
-                    verticalalignment='bottom')
-            ax.legend(bbox_to_anchor=(1, 1), loc=2)
-            ax.set_xlabel('time')
-            ax.set_ylabel('value')
-        return ax
+            axes[0].set_title(title)
+            axes[0].text(x=1.0, y=1.0, s=format_load_params(df), fontsize=7,
+                         transform=axes[0].transAxes,
+                         horizontalalignment='left',
+                         verticalalignment='bottom')
+        return axes
 
     @XdfDecorators.loaded
     def plot_data_box(self, *stream_ids, exclude=[], cols=None):
