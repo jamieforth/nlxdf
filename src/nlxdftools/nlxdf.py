@@ -328,7 +328,6 @@ class NlXdf(Xdf):
                          verticalalignment='bottom')
         return axes
 
-
     @XdfDecorators.loaded
     def plot_data_box(self, *stream_ids, exclude=[], cols=None):
         if cols is not None and not isinstance(cols, list):
