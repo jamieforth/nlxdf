@@ -35,14 +35,17 @@ class NlXdf(Xdf):
         'DESKTOP-RM16J67': 'eeg-n',
         'DESKTOP-N2RA68S': 'eeg-o',
         'DESKTOP-S597Q21': 'eeg-p',
-        'TABLET-06K1PLD4': 'eeg-q',
+        'DESKTOP-OE9298C': 'eeg-q',  # Snakeskin
+        'TABLET-06K1PLD4': 'eeg-q',  # Readings
         'DESKTOP-MK0GQFM': 'eeg-r',
         'DESKTOP-7GV3RJU': 'eeg-s',
         'DESKTOP-S5A1PPK': 'eeg-t',
         'TABLET-3BS4NTP2': 'eeg-u',
         'DESKTOP-QG4CNEV': 'eeg-v',
-        'DESKTOP-OAF4OCM': 'eeg-w',
-        'TABLET-47TCFCEB': 'eeg-cs-v', # DESKTOP-T3RKRMH?
+        'TABLET-STDTE3Q6': 'eeg-w',  # Snakeskin
+        'DESKTOP-OAF4OCM': 'eeg-w',  # Readings
+        'DESKTOP-T3RKRMH': 'eeg-x',
+        'TABLET-47TCFCEB': 'eeg-cs-v',
         'CGS-PCD-26098': 'tabarnak',
         'CGS-PCL-38928': 'laura',
         'cgs-macl-39034.campus.goldsmiths.ac.uk': 'mirko',
@@ -201,39 +204,64 @@ class NlXdf(Xdf):
         def make_nl_id(row, unique_id_counter, hostname_map):
             # Fallback to stream_id as string.
             nl_id = str(row.name)
+
+            # EEG devices.
             if row['type'].lower() == 'eeg':
-                # Map EEG devices.
-                nl_id = hostname_map[row['hostname']]
-            elif row['name'] == 'TimestampStream':
-                nl_id = 'ts-marker'
-            elif row['name'] == 'CameraRecordingTime':
-                nl_id = 'ts-video'
-            elif row['type'] == 'marker' and row['name'] == 'audio':
-                # Map audio device.
-                nl_id = 'ts-audio'
+                if row['hostname'] in hostname_map:
+                    # Map tablet hostname to eeg-* labels.
+                    nl_id = hostname_map[row['hostname']]
+                else:
+                    # Unknown EEG device.
+                    nl_id = 'eeg-?'
+
+            # Eye tracking.
             elif row['name'].lower().startswith('pupil'):
+                # Map Pupil Labs device/streams.
                 if row['type'].lower() == 'event':
                     nl_id = f'pl-{row["source_id"]}-event'
                 elif row['type'].lower() == 'gaze':
                     nl_id = f'pl-{row["source_id"]}-gaze'
+
+            # Marker streams.
+            elif row['name'] == 'TABARNAK V3':
+                nl_id = 'marker-ts'
+            elif row['name'] == 'TimestampStream':
+                nl_id = 'marker-ts'
+            elif row['name'] == 'CameraRecordingTime':
+                nl_id = 'marker-video'
+            elif row['name'] == 'audio':
+                nl_id = 'marker-audio'
+            elif row['name'] == 'Keyboard_Marker_Stream':
+                nl_id = 'marker-kb'
+            elif row['name'] == 'FrameNumber_Stream':
+                nl_id = 'marker-video'
+
+            # Simulated sync test streams.
             elif row['type'] == 'data' and row['name'].startswith('Test'):
                 if row['hostname'] in ['neurolive', 'bobby']:
                     # Sync test running on the LabRecorder host -- the
-                    # closest thing we have to a ground truth.
+                    # closest thing we have to a ground truth with
+                    # simulated data.
                     nl_id = 'test-ref'
                 elif row['hostname'] in hostname_map:
-                    # Sync test running on an EEG tablet.
+                    # Sync test running on an EEG tablet or known host.
                     nl_id = f'test-{hostname_map[row["hostname"]]}'
                 else:
                     # Sync test running on another device.
                     nl_id = 'test'
             elif row['type'] == 'control':
-                # Sync test control stream.
+                # Simulated sync test control stream.
                 nl_id = 'test-ctrl'
+
+            # Generic mappings.
             elif row['type'].lower() == 'markers':
-                nl_id = nl_id + '-markers'
+                # Catch-all marker stream mapper.
+                nl_id = 'marker-' + nl_id
             elif row['name'].startswith('_relay_'):
-                nl_id = nl_id + '-relay'
+                # Catch-all relayed streams.
+                nl_id = 'relay-' + nl_id
+
+            # Automatically increment ID for duplicate stream IDs.
             unique_id_counter.update([nl_id])
             if unique_id_counter[nl_id] > 1:
                 nl_id = f'{nl_id}-{unique_id_counter[nl_id]}'
@@ -299,6 +327,7 @@ class NlXdf(Xdf):
                          horizontalalignment='left',
                          verticalalignment='bottom')
         return axes
+
 
     @XdfDecorators.loaded
     def plot_data_box(self, *stream_ids, exclude=[], cols=None):
