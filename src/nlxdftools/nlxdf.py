@@ -156,6 +156,9 @@ class NlXdf(Xdf):
 
         # Map stream-IDs to neurolive IDs.
         self._loaded_stream_ids = self._map_stream_ids(self.loaded_stream_ids)
+        self._desc = self._map_stream_ids(self._desc)
+        self._segments = self._map_stream_ids(self._segments)
+        self._clock_segments = self._map_stream_ids(self._clock_segments)
         self._channel_metadata = self._map_stream_ids(self._channel_metadata)
         self._footer = self._map_stream_ids(self._footer)
         self._clock_offsets = self._map_stream_ids(self._clock_offsets)
