@@ -137,6 +137,7 @@ class NlXdf(Xdf):
             synchronize_clocks=True,
             dejitter_timestamps=True,
             handle_clock_resets=True,
+            handle_non_monotonic=True,
             **kwargs):
         """Load XDF data from file using pyxdf.load_xdf().
 
@@ -149,6 +150,7 @@ class NlXdf(Xdf):
                        synchronize_clocks=synchronize_clocks,
                        dejitter_timestamps=dejitter_timestamps,
                        handle_clock_resets=handle_clock_resets,
+                       handle_non_monotonic=handle_non_monotonic,
                        **kwargs)
         except (NoLoadableStreamsError, XdfAlreadyLoadedError) as exc:
             print(exc)
