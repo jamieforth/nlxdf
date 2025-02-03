@@ -19,7 +19,7 @@ your build tool/IDE of choice.
 
 
 ```
-$ git install -e https://github.com/jamieforth/nlxdf-tools.git
+$ pip install -e git+https://github.com/jamieforth/nlxdf-tools.git#nlxdftools
 ```
 
 NB. If you are installing manually you will also need to ensure you
