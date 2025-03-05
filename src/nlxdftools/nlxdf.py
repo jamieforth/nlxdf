@@ -5,8 +5,8 @@ from collections import Counter
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import pandas as pd
-from pyxdftools import Xdf, XdfDecorators
-from pyxdftools.errors import NoLoadableStreamsError, XdfAlreadyLoadedError
+from pdxdf import Xdf, XdfDecorators
+from pdxdf.errors import NoLoadableStreamsError, XdfAlreadyLoadedError
 
 from nlxdftools.plotting import format_load_params, format_title
 
