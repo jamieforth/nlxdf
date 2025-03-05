@@ -102,9 +102,10 @@ class NlXdf(Xdf):
             'ref': 'eeg',
             'aux': 'misc',
             'bip': 'misc',
-            'trigger': 'misc',
+            'trigger': 'stim',
             'counter': 'misc',
-            'trg': 'stim'
+            'trg': 'stim',
+            'exg': 'ecg',
         },
     }
 
@@ -195,6 +196,7 @@ class NlXdf(Xdf):
         data = super()._parse_channel_metadata(data, **kwargs)
         if data is not None:
             for df in data.values():
+                df['type'] = df['type'].str.lower()
                 # For AntNeuro App which doesn't include channel labels.
                 if 'index' in df and 'label' not in df:
                     df['label'] = df['index']
