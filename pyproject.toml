@@ -1,21 +1,21 @@
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "nlxdftools"
 version = "0.0.1"
+description = "Tools for working with NEUROLIVE XDF data files."
+readme = "README.md"
 authors = [
     {name="Jamie Forth", email="j.forth@gold.ac.uk"},
 ]
-description = "Tools for working with NEUROLIVE XDF data files."
-readme = "README.md"
-requires-python = ">=3.11"
 license = {text = "AGPL-3.0-or-later"}
+requires-python = ">=3.11"
 
 dependencies = [
-    "pandas[performance]",
+    "pandas[performance]>=2.2.3",
     "pdxdf @ git+https://github.com/jamieforth/pdxdf.git@main",
     "matplotlib>=3.9.2",
     "scipy>=1.15.2",
 ]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
