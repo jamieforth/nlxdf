@@ -32,8 +32,8 @@ class NlXdfDataset(Mapping):
         """Count the number of devices in each XDF file."""
         data = {}
         for recording, nlxdf in self.items():
-            metadata = nlxdf.resolve_streams()
-            data[recording] = len(metadata.index)
+            streams = nlxdf.resolve_streams()
+            data[recording] = len(streams.index)
         df = pd.DataFrame(data, index=['num device']).T
         df.index.rename('recording', inplace=True)
         return df
@@ -42,49 +42,50 @@ class NlXdfDataset(Mapping):
         """Tabulate stream-ids in each XDF file."""
         data = {}
         for recording, nlxdf in self.items():
-            metadata = nlxdf.resolve_streams()
-            data[recording] = pd.Series(list(metadata.index),
-                                        index=range(1, len(metadata) + 1))
+            streams = nlxdf.resolve_streams()
+            data[recording] = pd.Series(
+                list(streams.index), index=range(1, len(streams) + 1)
+            )
         df = pd.DataFrame(data)
-        df.columns.rename('recording', inplace=True)
+        df.columns.rename("recording", inplace=True)
         return df
 
     def hostnames(self):
         """Tabulate device hostnames in each XDF file."""
         data = {}
         for recording, nlxdf in self.items():
-            metadata = nlxdf.resolve_streams()
-            data[recording] = pd.Series(list(metadata['hostname']),
-                                        index=range(1, len(metadata) + 1))
+            streams = nlxdf.resolve_streams()
+            data[recording] = pd.Series(
+                list(streams["hostname"]), index=range(1, len(streams) + 1)
+            )
         df = pd.DataFrame(data)
-        df.columns.rename('recording', inplace=True)
+        df.columns.rename("recording", inplace=True)
         return df
 
     def source_ids(self, warn_changed=True):
         """Tabulate stream-ids and their source-id for each XDF file."""
         data = {}
         for recording, nlxdf in self.items():
-            metadata = nlxdf.resolve_streams()
-            data[recording] = metadata['source_id']
+            streams = nlxdf.resolve_streams()
+            data[recording] = streams["source_id"]
         df = pd.DataFrame(data)
         if warn_changed:
             stream_source_constant = df.apply(
-                lambda row: row.dropna().nunique() == 1,
-                axis=1)
-            source_changed = stream_source_constant.loc[
-                ~stream_source_constant]
+                lambda row: row.dropna().nunique() == 1, axis=1
+            )
+            source_changed = stream_source_constant.loc[~stream_source_constant]
             for src in source_changed.index:
-                print(f'Source changed {src}: {df.loc[src].dropna().unique()}')
-        df.index.rename('stream_id', inplace=True)
-        df.columns.rename('recording', inplace=True)
+                print(f"Source changed {src}: {df.loc[src].dropna().unique()}")
+        df.index.rename("stream_id", inplace=True)
+        df.columns.rename("recording", inplace=True)
         return df
 
     def count_stream_types(self):
         """Return number of streams per type in each XDF file."""
         data = {}
         for recording, nlxdf in self.items():
-            metadata = nlxdf.resolve_streams()
-            data[recording] = metadata.loc[:, 'type'].value_counts()
+            streams = nlxdf.resolve_streams()
+            data[recording] = streams.loc[:, 'type'].value_counts()
         df = pd.DataFrame(data).T
         df.index.rename('recording', inplace=True)
         df.replace(np.nan, 0, inplace=True)
@@ -94,14 +95,12 @@ class NlXdfDataset(Mapping):
         """Return number of channels per type per device for each XDF file."""
         data = {}
         for recording, nlxdf in self.items():
-            metadata = nlxdf.resolve_streams()
-            data[recording] = metadata.loc[
-                :, ['type', 'channel_count']
-            ]
-        df = pd.concat(data, names=['recording', 'stream_id'])
+            streams = nlxdf.resolve_streams()
+            data[recording] = streams.loc[:, ["type", "channel_count"]]
+        df = pd.concat(data, names=["recording", "stream_id"])
         return df
 
-    def time_stamp_summary(self, *select_streams, **kwargs):
+    def time_stamp_info(self, *select_streams, **kwargs):
         """Summarise loaded time-stamp data across recordings."""
         data = {}
         for recording, nlxdf in self.items():
@@ -110,7 +109,7 @@ class NlXdfDataset(Mapping):
             except ValueError as exc:
                 print(exc)
                 continue
-            data[recording] = nlxdf.time_stamp_summary()
+            data[recording] = nlxdf.time_stamp_info()
             nlxdf.unload()
         df = pd.concat(data)
         df.index.rename('recording', level=0, inplace=True)

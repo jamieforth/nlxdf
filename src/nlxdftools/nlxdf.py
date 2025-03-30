@@ -162,16 +162,16 @@ class NlXdf(Xdf):
         self._desc = self._map_stream_ids(self._desc)
         self._segments = self._map_stream_ids(self._segments)
         self._clock_segments = self._map_stream_ids(self._clock_segments)
-        self._channel_metadata = self._map_stream_ids(self._channel_metadata)
+        self._channel_info = self._map_stream_ids(self._channel_info)
         self._footer = self._map_stream_ids(self._footer)
         self._clock_offsets = self._map_stream_ids(self._clock_offsets)
         self._time_series = self._map_stream_ids(self._time_series)
         self._time_stamps = self._map_stream_ids(self._time_stamps)
         return self
 
-    def _parse_metadata(self, data, nl_id_as_index=True, **kwargs):
+    def _parse_info(self, data, nl_id_as_index=True, **kwargs):
         """Map neurolive stream ids and types."""
-        df = super()._parse_metadata(data, **kwargs)
+        df = super()._parse_info(data, **kwargs)
         # Lowercase types following MNE convention.
         df['type'] = df['type'].str.lower()
         # Fix-up metadata types.
@@ -191,9 +191,9 @@ class NlXdf(Xdf):
             df = df[cols]
         return df
 
-    def _parse_channel_metadata(self, data, **kwargs):
+    def _parse_channel_info(self, data, **kwargs):
         """Map AntNeuro stream ids and channel names."""
-        data = super()._parse_channel_metadata(data, **kwargs)
+        data = super()._parse_channel_info(data, **kwargs)
         if data is not None:
             for df in data.values():
                 df['type'] = df['type'].str.lower()
@@ -299,8 +299,8 @@ class NlXdf(Xdf):
         return data
 
     def _stream_id_to_nl_id(self, stream_id):
-        nl_id = self._metadata.index[
-            self._metadata['stream_id'] == stream_id
+        nl_id = self._info.index[
+            self._info['stream_id'] == stream_id
         ][0]
         return nl_id
 
