@@ -304,7 +304,6 @@ class NlXdf(Xdf):
         ][0]
         return nl_id
 
-    @XdfDecorators.loaded
     def plot_data(self, *stream_ids, exclude=[], cols=None, subplots=False):
         data = self.data(*stream_ids,
                          exclude=exclude,
@@ -335,7 +334,6 @@ class NlXdf(Xdf):
                          verticalalignment='bottom')
         return axes
 
-    @XdfDecorators.loaded
     def plot_data_box(self, *stream_ids, exclude=[], cols=None):
         if cols is not None and not isinstance(cols, list):
             cols = [cols]

@@ -116,13 +116,13 @@ class NlXdfDataset(Mapping):
         return df
 
     def plot_sample_counts(self, *select_streams, **kwargs):
-        df = self.time_stamp_summary(*select_streams, **kwargs)
+        df = self.time_stamp_info(*select_streams, **kwargs)
         ax = plotting.plot_sample_counts_df(df)
         return ax
 
     def max_sample_count_diff(self, *select_streams, **kwargs):
         """Compute maximum sample count difference across recordings."""
-        df = self.time_stamp_summary(*select_streams, **kwargs)
+        df = self.time_stamp_info(*select_streams, **kwargs)
         max_samples = df['sample_count'].groupby(level=0, sort=False).max()
         min_samples = df['sample_count'].groupby(level=0, sort=False).min()
         count_diff = max_samples - min_samples
