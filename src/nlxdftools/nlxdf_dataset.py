@@ -161,10 +161,9 @@ class NlXdfDataset(Mapping):
             except ValueError as exc:
                 print(exc)
                 continue
-            data[recording] = {
-                stream_id: len(segments) for stream_id, segments in nlxdf.segments().items()
-            }
+            data[recording] = nlxdf.segment_info()
             nlxdf.unload()
-        df = pd.DataFrame(data)
+        df = pd.concat(data)
+        df.index.rename('recording', level=0, inplace=True)
         return df
 
