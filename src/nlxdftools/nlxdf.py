@@ -353,3 +353,19 @@ class NlXdf(Xdf):
                     verticalalignment='bottom')
             ax.set_xlabel('value')
         return ax
+
+    def check_channels(self, expected):
+        if not isinstance(expected, pd.Series):
+            expected = pd.Series(expected, name="expected")
+        ch = self.channel_info(cols='label', concat=True)
+        ch = ch.droplevel(1, axis=1)
+        same = ch.eq(expected, axis=0)
+        if same.all().all():
+            return None
+        else:
+            different = ch.loc[:, ~same.all()]
+            different = different.fillna('missing')
+            different = different[~different.eq(expected, axis=0)]
+            different['expected'] = expected
+            return different.dropna()
+            #return pd.concat([expected, different], axis=1).dropna()

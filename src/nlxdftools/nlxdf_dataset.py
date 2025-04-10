@@ -167,3 +167,21 @@ class NlXdfDataset(Mapping):
         df.index.rename('recording', level=0, inplace=True)
         return df
 
+    def check_channels(self, expected, *select_streams, **kwargs):
+        """Check all devices have expected channels across recordings."""
+        data = {}
+        for recording, nlxdf in self.items():
+            try:
+                nlxdf.load(*select_streams, **kwargs)
+            except ValueError as exc:
+                print(exc)
+                continue
+            different = nlxdf.check_channels(expected)
+            if different is None:
+                print(f"{recording} channels correct")
+            else:
+                data[recording] = different
+            nlxdf.unload()
+        df = pd.concat(data)
+        df.index.rename('recording', level=0, inplace=True)
+        return df
