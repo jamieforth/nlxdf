@@ -151,3 +151,20 @@ class NlXdfDataset(Mapping):
         df = self.time_stamp_intervals(*select_streams, **kwargs)
         axes = plotting.plot_time_stamp_intervals_df(df, units, showfliers)
         return axes
+
+    def segment_info(self, *select_streams, **kwargs):
+        """Summarise loaded segment data across recordings."""
+        data = {}
+        for recording, nlxdf in self.items():
+            try:
+                nlxdf.load(*select_streams, **kwargs)
+            except ValueError as exc:
+                print(exc)
+                continue
+            data[recording] = {
+                stream_id: len(segments) for stream_id, segments in nlxdf.segments().items()
+            }
+            nlxdf.unload()
+        df = pd.DataFrame(data)
+        return df
+
