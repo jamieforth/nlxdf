@@ -304,7 +304,7 @@ class NlXdf(Xdf):
         ][0]
         return nl_id
 
-    def plot_data(self, *stream_ids, exclude=[], cols=None, subplots=False):
+    def plot_data(self, *stream_ids, exclude=[], cols=None, title='XDF data', subplots=False):
         data = self.data(*stream_ids,
                          exclude=exclude,
                          cols=cols,
@@ -314,7 +314,7 @@ class NlXdf(Xdf):
             n = len(data)
             if n > 1 and subplots:
                 fig, axes = plt.subplots(n,
-                                         figsize=(6, 4 * (0.5 * n)),
+                                         figsize=(10, 4 * (0.5 * n)),
                                          sharex=True,
                                          sharey=True)
             else:
@@ -325,7 +325,6 @@ class NlXdf(Xdf):
                 ax = axes[i % len(axes)]
                 df.plot(ax=ax)
                 ax.legend(bbox_to_anchor=(1, 1), loc=2)
-            title = 'XDF data'
             title = format_title(title, df)
             axes[0].set_title(title)
             axes[0].text(x=1.0, y=1.0, s=format_load_params(df), fontsize=7,
@@ -334,7 +333,7 @@ class NlXdf(Xdf):
                          verticalalignment='bottom')
         return axes
 
-    def plot_data_box(self, *stream_ids, exclude=[], cols=None):
+    def plot_data_box(self, *stream_ids, exclude=[], cols=None, title='XDF data'):
         if cols is not None and not isinstance(cols, list):
             cols = [cols]
         df = self.data(*stream_ids,
@@ -346,7 +345,6 @@ class NlXdf(Xdf):
                              plt.cycler('color', plt.cm.tab20.colors)}):
             ax = df.plot.box(vert=False)
             ax.invert_yaxis()
-            title = 'XDF data'
             title = format_title(title, df)
             ax.set_title(title)
             ax.text(x=1.0, y=1.0, s=format_load_params(df), fontsize=7,
