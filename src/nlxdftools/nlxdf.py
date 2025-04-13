@@ -169,6 +169,21 @@ class NlXdf(Xdf):
         self._time_stamps = self._map_stream_ids(self._time_stamps)
         return self
 
+    def check_channels(self, expected):
+        if not isinstance(expected, pd.Series):
+            expected = pd.Series(expected, name="expected")
+        ch = self.channel_info(cols='label', concat=True)
+        ch = ch.droplevel(1, axis=1)
+        same = ch.eq(expected, axis=0)
+        if same.all().all():
+            return "All channels correct"
+        else:
+            different = ch.loc[:, ~same.all()]
+            different = different.fillna('missing')
+            different = different[~different.eq(expected, axis=0)]
+            different['expected'] = expected
+            return different.dropna()
+
     def _parse_info(self, data, nl_id_as_index=True, **kwargs):
         """Map neurolive stream ids and types."""
         df = super()._parse_info(data, **kwargs)
@@ -353,19 +368,3 @@ class NlXdf(Xdf):
                     verticalalignment='bottom')
             ax.set_xlabel('value')
         return ax
-
-    def check_channels(self, expected):
-        if not isinstance(expected, pd.Series):
-            expected = pd.Series(expected, name="expected")
-        ch = self.channel_info(cols='label', concat=True)
-        ch = ch.droplevel(1, axis=1)
-        same = ch.eq(expected, axis=0)
-        if same.all().all():
-            return None
-        else:
-            different = ch.loc[:, ~same.all()]
-            different = different.fillna('missing')
-            different = different[~different.eq(expected, axis=0)]
-            different['expected'] = expected
-            return different.dropna()
-            #return pd.concat([expected, different], axis=1).dropna()
