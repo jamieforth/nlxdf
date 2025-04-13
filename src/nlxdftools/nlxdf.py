@@ -319,6 +319,62 @@ class NlXdf(Xdf):
         ][0]
         return nl_id
 
+    def plot_time_stamps(
+        self,
+        *stream_ids,
+        exclude=[],
+        title="Time-stamps",
+        subplots=False,
+        non_monotonic=False,
+        downsample_non_monotonic=True,
+    ):
+        data = self.time_stamps(*stream_ids, exclude=exclude, with_stream_id=True)
+        with mpl.rc_context(
+            {"axes.prop_cycle": plt.cycler("color", plt.cm.tab20.colors)}
+        ):
+            n = len(data)
+            if n > 1 and subplots:
+                fig, axes = plt.subplots(
+                    n, figsize=(8, 4 * (0.8 * n)), sharex=True, sharey=True
+                )
+            else:
+                fig, ax = plt.subplots(1)
+                axes = [ax]
+            for i, (stream_id, ts) in zip(range(n), data.items()):
+                ax = axes[i % len(axes)]
+                if non_monotonic:
+                    non_mono = ts.loc[ts["time_stamp"].diff() < 0]
+                    if downsample_non_monotonic:
+                        downsample = max(int(non_mono.shape[0] / 500), 1)
+                    else:
+                        downsample = 1
+                    if non_mono["time_stamp"].any():
+                        non_mono[::downsample].plot.scatter(
+                            "time_stamp",
+                            "time_stamp",
+                            marker="_",
+                            linewidth=0.5,
+                            ax=ax,
+                            s=500,
+                            color=plt.cm.tab20.colors[7],
+                            alpha=0.8,
+                            label='non-monotonic',
+                        )
+                ts.plot.scatter("time_stamp", "time_stamp", ax=ax, label=stream_id, s=1)
+                ax.legend(bbox_to_anchor=(1, 1), loc=2)
+            title = format_title(title, ts)
+            axes[0].set_title(title)
+            axes[0].text(
+                x=1.0,
+                y=1.0,
+                s=format_load_params(ts),
+                fontsize=7,
+                transform=axes[0].transAxes,
+                horizontalalignment="left",
+                verticalalignment="bottom",
+            )
+        return axes
+
     def plot_data(
         self, *stream_ids, exclude=[], cols=None, title="XDF data", subplots=False
     ):
