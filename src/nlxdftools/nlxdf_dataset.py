@@ -91,67 +91,6 @@ class NlXdfDataset(Mapping):
         df.replace(np.nan, 0, inplace=True)
         return df
 
-    def count_channels_per_type(self):
-        """Return number of channels per type per device for each XDF file."""
-        data = {}
-        for recording, nlxdf in self.items():
-            streams = nlxdf.resolve_streams()
-            data[recording] = streams.loc[:, ["type", "channel_count"]]
-        df = pd.concat(data, names=["recording", "stream_id"])
-        return df
-
-    def time_stamp_info(self, *select_streams, **kwargs):
-        """Summarise loaded time-stamp data across recordings."""
-        data = {}
-        for recording, nlxdf in self.items():
-            try:
-                nlxdf.load(*select_streams, **kwargs)
-            except ValueError as exc:
-                print(exc)
-                continue
-            data[recording] = nlxdf.time_stamp_info()
-            nlxdf.unload()
-        df = pd.concat(data)
-        df.index.rename('recording', level=0, inplace=True)
-        return df
-
-    def plot_sample_counts(self, *select_streams, **kwargs):
-        df = self.time_stamp_info(*select_streams, **kwargs)
-        ax = plotting.plot_sample_counts_df(df)
-        return ax
-
-    def max_sample_count_diff(self, *select_streams, **kwargs):
-        """Compute maximum sample count difference across recordings."""
-        df = self.time_stamp_info(*select_streams, **kwargs)
-        max_samples = df['sample_count'].groupby(level=0, sort=False).max()
-        min_samples = df['sample_count'].groupby(level=0, sort=False).min()
-        count_diff = max_samples - min_samples
-        count_diff.name = 'max_sample_count_diff'
-        return count_diff
-
-    def time_stamp_intervals(self, *select_streams, **kwargs):
-        """Return time-stamp intervals across recordings."""
-        data = {}
-        for recording, nlxdf in self.items():
-            try:
-                nlxdf.load(*select_streams, **kwargs)
-            except ValueError as exc:
-                print(exc)
-                continue
-            intervals = nlxdf.time_stamp_intervals()
-            if intervals is not None:
-                data[recording] = intervals
-            nlxdf.unload()
-        df = pd.concat(data)
-        df.index.rename('recording', level=0, inplace=True)
-        return df
-
-    def plot_time_stamp_intervals(self, *select_streams, units='nanoseconds',
-                                  showfliers=True, **kwargs):
-        df = self.time_stamp_intervals(*select_streams, **kwargs)
-        axes = plotting.plot_time_stamp_intervals_df(df, units, showfliers)
-        return axes
-
     def segment_info(self, *select_streams, **kwargs):
         """Summarise loaded segment data across recordings."""
         data = {}
@@ -165,6 +104,15 @@ class NlXdfDataset(Mapping):
             nlxdf.unload()
         df = pd.concat(data)
         df.index.rename('recording', level=0, inplace=True)
+        return df
+
+    def count_channels_per_type(self):
+        """Return number of channels per type per device for each XDF file."""
+        data = {}
+        for recording, nlxdf in self.items():
+            streams = nlxdf.resolve_streams()
+            data[recording] = streams.loc[:, ["type", "channel_count"]]
+        df = pd.concat(data, names=["recording", "stream_id"])
         return df
 
     def check_channels(self, expected, *select_streams, **kwargs):
@@ -185,3 +133,72 @@ class NlXdfDataset(Mapping):
         df = pd.concat(data)
         df.index.rename('recording', level=0, inplace=True)
         return df
+
+    def time_stamp_info(self, *select_streams, exclude=[], min_segment=0, **kwargs):
+        """Summarise loaded time-stamp data across recordings."""
+        data = {}
+        for recording, nlxdf in self.items():
+            try:
+                nlxdf.load(*select_streams, **kwargs)
+            except ValueError as exc:
+                print(exc)
+                continue
+            data[recording] = nlxdf.time_stamp_info(
+                exclude=exclude, min_segment=min_segment
+            )
+            nlxdf.unload()
+        df = pd.concat(data)
+        df.index.rename("recording", level=0, inplace=True)
+        return df
+
+    def plot_sample_counts(self, *select_streams, **kwargs):
+        df = self.time_stamp_info(*select_streams, **kwargs)
+        ax = plotting.plot_sample_counts_df(df)
+        return ax
+
+    def max_sample_count_diff(self, *select_streams, **kwargs):
+        """Compute maximum sample count difference across recordings."""
+        df = self.time_stamp_info(*select_streams, **kwargs)
+        max_samples = df['sample_count'].groupby(level=0, sort=False).max()
+        min_samples = df['sample_count'].groupby(level=0, sort=False).min()
+        count_diff = max_samples - min_samples
+        count_diff.name = 'max_sample_count_diff'
+        return count_diff
+
+    def time_stamp_intervals(
+        self, *select_streams, exclude=[], min_segment=0, **kwargs
+    ):
+        """Return time-stamp intervals across recordings."""
+        data = {}
+        for recording, nlxdf in self.items():
+            try:
+                nlxdf.load(*select_streams, **kwargs)
+            except ValueError as exc:
+                print(exc)
+                continue
+            intervals = nlxdf.time_stamp_intervals(
+                exclude=exclude,
+                min_segment=min_segment,
+                concat=True,
+            )
+            if intervals is not None:
+                data[recording] = intervals
+            nlxdf.unload()
+        df = pd.concat(data)
+        df.index.rename("recording", level=0, inplace=True)
+        return df
+
+    def plot_time_stamp_intervals(
+        self,
+        *select_streams,
+        exclude=[],
+        min_segment=0,
+        units="nanoseconds",
+        showfliers=True,
+        **kwargs,
+    ):
+        df = self.time_stamp_intervals(
+            *select_streams, exclude=exclude, min_segment=min_segment, **kwargs
+        )
+        axes = plotting.plot_time_stamp_intervals_df(df, units, showfliers)
+        return axes
