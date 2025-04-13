@@ -319,33 +319,78 @@ class NlXdf(Xdf):
         ][0]
         return nl_id
 
-    def plot_data(self, *stream_ids, exclude=[], cols=None, title='XDF data', subplots=False):
-        data = self.data(*stream_ids,
-                         exclude=exclude,
-                         cols=cols,
-                         with_stream_id=True)
-        with mpl.rc_context({'axes.prop_cycle':
-                             plt.cycler('color', plt.cm.tab20.colors)}):
+    def plot_data(
+        self, *stream_ids, exclude=[], cols=None, title="XDF data", subplots=False
+    ):
+        data = self.data(*stream_ids, exclude=exclude, cols=cols, with_stream_id=True)
+        with mpl.rc_context(
+            {"axes.prop_cycle": plt.cycler("color", plt.cm.tab20.colors)}
+        ):
             n = len(data)
             if n > 1 and subplots:
-                fig, axes = plt.subplots(n,
-                                         figsize=(10, 4 * (0.5 * n)),
-                                         sharex=True,
-                                         sharey=True)
+                fig, axes = plt.subplots(
+                    n, figsize=(10, 4 * (0.5 * n)), sharex=True, sharey=True
+                )
             else:
                 fig, ax = plt.subplots(1)
                 axes = [ax]
-            for (stream_id, df), i in zip(data.items(), range(n)):
+            for i, (stream_id, df), segments, clock_segments in zip(
+                range(n),
+                data.items(),
+                self.segments(
+                    *stream_ids, exclude=exclude, with_stream_id=True
+                ).values(),
+                self.clock_segments(
+                    *stream_ids, exclude=exclude, with_stream_id=True
+                ).values(),
+            ):
                 df = pd.concat({stream_id: df}, axis=1)
                 ax = axes[i % len(axes)]
+                for i, (seg_start, seg_end) in zip(range(len(segments)), segments):
+                    # Plot start of segments.
+                    if i == 0:
+                        ax.axvline(
+                            df.index[seg_start],
+                            color=plt.cm.tab20.colors[2],
+                            alpha=0.5,
+                            label="segments",
+                        )
+                    else:
+                        ax.axvline(
+                            df.index[seg_start],
+                            color=plt.cm.tab20.colors[2],
+                            alpha=0.5,
+                        )
+                for i, (c_seg_start, c_seg_end) in zip(
+                    range(len(clock_segments)), clock_segments
+                ):
+                    # Plot end of clock segments.
+                    if i == 0:
+                        ax.axvline(
+                            df.index[c_seg_end],
+                            color=plt.cm.tab20.colors[6],
+                            alpha=0.5,
+                            label="clock segments",
+                        )
+                    else:
+                        ax.axvline(
+                            df.index[c_seg_end],
+                            color=plt.cm.tab20.colors[6],
+                            alpha=0.5,
+                        )
                 df.plot(ax=ax)
                 ax.legend(bbox_to_anchor=(1, 1), loc=2)
             title = format_title(title, df)
             axes[0].set_title(title)
-            axes[0].text(x=1.0, y=1.0, s=format_load_params(df), fontsize=7,
-                         transform=axes[0].transAxes,
-                         horizontalalignment='left',
-                         verticalalignment='bottom')
+            axes[0].text(
+                x=1.0,
+                y=1.0,
+                s=format_load_params(df),
+                fontsize=7,
+                transform=axes[0].transAxes,
+                horizontalalignment="left",
+                verticalalignment="bottom",
+            )
         return axes
 
     def plot_data_box(self, *stream_ids, exclude=[], cols=None, title='XDF data'):
