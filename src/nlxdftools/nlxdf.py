@@ -393,23 +393,31 @@ class NlXdf(Xdf):
             )
         return axes
 
-    def plot_data_box(self, *stream_ids, exclude=[], cols=None, title='XDF data'):
+    def plot_data_box(self, *stream_ids, exclude=[], cols=None, title="XDF data"):
         if cols is not None and not isinstance(cols, list):
             cols = [cols]
-        df = self.data(*stream_ids,
-                       exclude=exclude,
-                       cols=cols,
-                       with_stream_id=True,
-                       as_single_df=True)
-        with mpl.rc_context({'axes.prop_cycle':
-                             plt.cycler('color', plt.cm.tab20.colors)}):
+        df = self.data(
+            *stream_ids,
+            exclude=exclude,
+            cols=cols,
+            with_stream_id=True,
+            as_single_df=True,
+        )
+        with mpl.rc_context(
+            {"axes.prop_cycle": plt.cycler("color", plt.cm.tab20.colors)}
+        ):
             ax = df.plot.box(vert=False)
             ax.invert_yaxis()
             title = format_title(title, df)
             ax.set_title(title)
-            ax.text(x=1.0, y=1.0, s=format_load_params(df), fontsize=7,
-                    transform=ax.transAxes,
-                    horizontalalignment='left',
-                    verticalalignment='bottom')
-            ax.set_xlabel('value')
+            ax.text(
+                x=1.0,
+                y=1.0,
+                s=format_load_params(df),
+                fontsize=7,
+                transform=ax.transAxes,
+                horizontalalignment="left",
+                verticalalignment="bottom",
+            )
+            ax.set_xlabel("value")
         return ax
