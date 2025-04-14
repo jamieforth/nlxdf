@@ -31,7 +31,7 @@ def format_load_params(df):
                 if k != "select_streams"
             ]
         )
-    return params
+        return params
 
 
 def format_title(title, df):

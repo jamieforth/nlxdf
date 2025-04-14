@@ -343,13 +343,13 @@ class NlXdf(Xdf):
             for i, (stream_id, ts) in zip(range(n), data.items()):
                 ax = axes[i % len(axes)]
                 if non_monotonic:
-                    non_mono = ts.loc[ts["time_stamp"].diff() < 0]
+                    non_mono = ts.loc[ts.diff() < 0]
                     if downsample_non_monotonic:
                         downsample = max(int(non_mono.shape[0] / 500), 1)
                     else:
                         downsample = 1
-                    if non_mono["time_stamp"].any():
-                        non_mono[::downsample].plot.scatter(
+                    if non_mono.any():
+                        non_mono.to_frame()[::downsample].plot.scatter(
                             "time_stamp",
                             "time_stamp",
                             marker="_",
@@ -360,7 +360,7 @@ class NlXdf(Xdf):
                             alpha=0.8,
                             label='non-monotonic',
                         )
-                ts.plot.scatter("time_stamp", "time_stamp", ax=ax, label=stream_id, s=1)
+                ts.to_frame().plot.scatter("time_stamp", "time_stamp", ax=ax, label=stream_id, s=1)
                 ax.legend(bbox_to_anchor=(1, 1), loc=2)
             title = format_title(title, ts)
             axes[0].set_title(title)
