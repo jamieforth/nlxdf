@@ -78,7 +78,8 @@ def plot_sample_counts_df(df):
 
 
 # FIXME by segment?
-def plot_time_stamp_intervals_df(df, units="milliseconds", showfliers=True):
+def plot_time_stamp_intervals_df(s, units="milliseconds", showfliers=True):
+    df = s.to_frame()
     df = scale_seconds(df, units)
     n = df.index.levels[0].size
     cols = 2
@@ -121,7 +122,7 @@ def plot_first_time_stamps_df(df, units="seconds"):
     axes = axes.ravel()
     for (rec, data), i in zip(df.groupby(level=0, sort=False), range(0, n)):
         # First segment only.
-        data = data.xs(0, level='segment')
+        data = data.xs(0, level="segment")
         data.reset_index().plot.scatter(
             x="first_timestamp", y="stream_id", marker="|", ax=axes[i]
         )
@@ -145,7 +146,7 @@ def plot_first_time_stamps_df(df, units="seconds"):
 
 def plot_first_time_stamps_dist_df(df, units="seconds"):
     # First segment only.
-    df = df.xs(0, level='segment')
+    df = df.xs(0, level="segment")
     df = scale_seconds(df, units)
     earliest = df["first_timestamp"].groupby(level=0, sort=False).min()
     df = df["first_timestamp"] - earliest

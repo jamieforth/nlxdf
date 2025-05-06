@@ -14,98 +14,98 @@ from nlxdftools.plotting import format_load_params, format_title
 class NlXdf(Xdf):
     """Class for working with individual Neurolive/AntNeuro XDF data files.
 
-    Provides a pandas-based layer of abstraction over raw XDF data to
-    simplify data processing.
+    Provides a pandas-based layer of abstraction over raw XDF data to simplify
+    data processing.
     """
 
     hostname_device_mapper = {
-        'DESKTOP-3R7C1PH': 'eeg-a',
-        'DESKTOP-2TI6RBU': 'eeg-b',
-        'DESKTOP-MN7K6RM': 'eeg-c',
-        'DESKTOP-URRV98M': 'eeg-d',
-        'DESKTOP-DATOEVU': 'eeg-e',
-        'TABLET-9I44R1AR': 'eeg-f',
-        'DESKTOP-SLAKFQE': 'eeg-g',
-        'DESKTOP-6FJTJJN': 'eeg-h',
-        'DESKTOP-HDOESKS': 'eeg-i',
-        'DESKTOP-LIA3G09': 'eeg-j',
-        'DESKTOP-V6779I4': 'eeg-k',
-        'DESKTOP-PLV2A7L': 'eeg-l',
-        'DESKTOP-SSSOE1L': 'eeg-m',
-        'DESKTOP-RM16J67': 'eeg-n',
-        'DESKTOP-N2RA68S': 'eeg-o',
-        'DESKTOP-S597Q21': 'eeg-p',
-        'DESKTOP-OE9298C': 'eeg-q',  # Snakeskin
-        'TABLET-06K1PLD4': 'eeg-q',  # Readings
-        'DESKTOP-MK0GQFM': 'eeg-r',
-        'DESKTOP-7GV3RJU': 'eeg-s',
-        'DESKTOP-S5A1PPK': 'eeg-t',
-        'TABLET-3BS4NTP2': 'eeg-u',
-        'DESKTOP-QG4CNEV': 'eeg-v',
-        'TABLET-STDTE3Q6': 'eeg-w',  # Snakeskin
-        'DESKTOP-OAF4OCM': 'eeg-w',  # Readings
-        'DESKTOP-T3RKRMH': 'eeg-x',
-        'TABLET-47TCFCEB': 'eeg-cs-v',
-        'CGS-PCD-26098': 'tabarnak',
-        'CGS-PCL-38928': 'laura',
-        'cgs-macl-39034.campus.goldsmiths.ac.uk': 'mirko',
-        'kassia': 'jamief',
+        "DESKTOP-3R7C1PH": "eeg-a",
+        "DESKTOP-2TI6RBU": "eeg-b",
+        "DESKTOP-MN7K6RM": "eeg-c",
+        "DESKTOP-URRV98M": "eeg-d",
+        "DESKTOP-DATOEVU": "eeg-e",
+        "TABLET-9I44R1AR": "eeg-f",
+        "DESKTOP-SLAKFQE": "eeg-g",
+        "DESKTOP-6FJTJJN": "eeg-h",
+        "DESKTOP-HDOESKS": "eeg-i",
+        "DESKTOP-LIA3G09": "eeg-j",
+        "DESKTOP-V6779I4": "eeg-k",
+        "DESKTOP-PLV2A7L": "eeg-l",
+        "DESKTOP-SSSOE1L": "eeg-m",
+        "DESKTOP-RM16J67": "eeg-n",
+        "DESKTOP-N2RA68S": "eeg-o",
+        "DESKTOP-S597Q21": "eeg-p",
+        "DESKTOP-OE9298C": "eeg-q",  # Snakeskin
+        "TABLET-06K1PLD4": "eeg-q",  # Readings
+        "DESKTOP-MK0GQFM": "eeg-r",
+        "DESKTOP-7GV3RJU": "eeg-s",
+        "DESKTOP-S5A1PPK": "eeg-t",
+        "TABLET-3BS4NTP2": "eeg-u",
+        "DESKTOP-QG4CNEV": "eeg-v",
+        "TABLET-STDTE3Q6": "eeg-w",  # Snakeskin
+        "DESKTOP-OAF4OCM": "eeg-w",  # Readings
+        "DESKTOP-T3RKRMH": "eeg-x",
+        "TABLET-47TCFCEB": "eeg-cs-v",
+        "CGS-PCD-26098": "tabarnak",
+        "CGS-PCL-38928": "laura",
+        "cgs-macl-39034.campus.goldsmiths.ac.uk": "mirko",
+        "kassia": "jamief",
     }
 
     metadata_mapper = {
-        'type': {
-            'EEG': 'eeg',
+        "type": {
+            "EEG": "eeg",
             #'marker': 'Timestamp',
         },
     }
 
     channel_metadata_mapper = {
-        'label': {
-            '0': 'Fp1',
-            '1': 'Fpz',
-            '2': 'Fp2',
-            '3': 'F7',
-            '4': 'F3',
-            '5': 'Fz',
-            '6': 'F4',
-            '7': 'F8',
-            '8': 'FC5',
-            '9': 'FC1',
-            '10': 'FC2',
-            '11': 'FC6',
-            '12': 'M1',
-            '13': 'T7',
-            '14': 'C3',
-            '15': 'Cz',
-            '16': 'C4',
-            '17': 'T8',
-            '18': 'M2',
-            '19': 'CP5',
-            '20': 'CP1',
-            '21': 'CP2',
-            '22': 'CP6',
-            '23': 'P7',
-            '24': 'P3',
-            '25': 'Pz',
-            '26': 'P4',
-            '27': 'P8',
-            '28': 'POz',
-            '29': 'O1',
-            '30': 'Oz',
-            '31': 'O2',
-            '32': 'Resp',  # EEG 101 with 34 channels?
-            '67': 'CPz',
-            '33': 'trigger',
-            '34': 'counter',
+        "label": {
+            "0": "Fp1",
+            "1": "Fpz",
+            "2": "Fp2",
+            "3": "F7",
+            "4": "F3",
+            "5": "Fz",
+            "6": "F4",
+            "7": "F8",
+            "8": "FC5",
+            "9": "FC1",
+            "10": "FC2",
+            "11": "FC6",
+            "12": "M1",
+            "13": "T7",
+            "14": "C3",
+            "15": "Cz",
+            "16": "C4",
+            "17": "T8",
+            "18": "M2",
+            "19": "CP5",
+            "20": "CP1",
+            "21": "CP2",
+            "22": "CP6",
+            "23": "P7",
+            "24": "P3",
+            "25": "Pz",
+            "26": "P4",
+            "27": "P8",
+            "28": "POz",
+            "29": "O1",
+            "30": "Oz",
+            "31": "O2",
+            "32": "Resp",  # EEG 101 with 34 channels?
+            "67": "CPz",
+            "33": "trigger",
+            "34": "counter",
         },
-        'type': {
-            'ref': 'eeg',
-            'aux': 'misc',
-            'bip': 'misc',
-            'trigger': 'stim',
-            'counter': 'misc',
-            'trg': 'stim',
-            'exg': 'ecg',
+        "type": {
+            "ref": "eeg",
+            "aux": "misc",
+            "bip": "misc",
+            "trigger": "stim",
+            "counter": "misc",
+            "trg": "stim",
+            "exg": "ecg",
         },
     }
 
@@ -116,11 +116,11 @@ class NlXdf(Xdf):
         """
         df = super().resolve_streams()
         nl_ids = self._create_nl_ids(df)
-        df['nl_id'] = nl_ids
+        df["nl_id"] = nl_ids
         if nl_id_as_index:
             # Set nl_id as the index.
             df.reset_index(inplace=True)
-            df.set_index('nl_id', inplace=True, verify_integrity=True)
+            df.set_index("nl_id", inplace=True, verify_integrity=True)
             df.sort_index(inplace=True)
         else:
             # Append nl_id as a new column.
@@ -131,28 +131,31 @@ class NlXdf(Xdf):
         return df
 
     def load(
-            self,
-            *select_streams,
-            channel_scale_field='unit',
-            channel_name_field='label',
-            synchronize_clocks=True,
-            dejitter_timestamps=True,
-            handle_clock_resets=True,
-            handle_non_monotonic=True,
-            **kwargs):
+        self,
+        *select_streams,
+        channel_scale_field="unit",
+        channel_name_field="label",
+        synchronize_clocks=True,
+        dejitter_timestamps=True,
+        handle_clock_resets=True,
+        handle_non_monotonic="trust_timeseries",
+        **kwargs,
+    ):
         """Load XDF data from file using pyxdf.load_xdf().
 
         Apply custom defaults for Neurolive analysis.
         """
         try:
-            self._load(*select_streams,
-                       channel_scale_field=channel_scale_field,
-                       channel_name_field=channel_name_field,
-                       synchronize_clocks=synchronize_clocks,
-                       dejitter_timestamps=dejitter_timestamps,
-                       handle_clock_resets=handle_clock_resets,
-                       handle_non_monotonic=handle_non_monotonic,
-                       **kwargs)
+            self._load(
+                *select_streams,
+                channel_scale_field=channel_scale_field,
+                channel_name_field=channel_name_field,
+                synchronize_clocks=synchronize_clocks,
+                dejitter_timestamps=dejitter_timestamps,
+                handle_clock_resets=handle_clock_resets,
+                handle_non_monotonic=handle_non_monotonic,
+                **kwargs,
+            )
         except (NoLoadableStreamsError, XdfAlreadyLoadedError) as exc:
             print(exc)
             return self
@@ -167,36 +170,38 @@ class NlXdf(Xdf):
         self._clock_offsets = self._map_stream_ids(self._clock_offsets)
         self._time_series = self._map_stream_ids(self._time_series)
         self._time_stamps = self._map_stream_ids(self._time_stamps)
+
         return self
 
     def check_channels(self, expected):
         if not isinstance(expected, pd.Series):
             expected = pd.Series(expected, name="expected")
-        ch = self.channel_info(cols='label', concat=True)
+        ch = self.channel_info(cols="label", concat=True)
         ch = ch.droplevel(1, axis=1)
         same = ch.eq(expected, axis=0)
         if same.all().all():
             return "All channels correct"
         else:
             different = ch.loc[:, ~same.all()]
-            different = different.fillna('missing')
+            different = different.fillna("missing")
             different = different[~different.eq(expected, axis=0)]
-            different['expected'] = expected
+            different["expected"] = expected
             return different.dropna()
 
     def _parse_info(self, data, nl_id_as_index=True, **kwargs):
         """Map neurolive stream ids and types."""
         df = super()._parse_info(data, **kwargs)
         # Lowercase types following MNE convention.
-        df['type'] = df['type'].str.lower()
+        df["type"] = df["type"].str.lower()
         # Fix-up metadata types.
         df.replace(self.metadata_mapper, inplace=True)
         nl_ids = self._create_nl_ids(df)
-        df['nl_id'] = nl_ids
+        df["nl_id"] = nl_ids
         if nl_id_as_index:
             # Set nl_id as the index.
             df.reset_index(inplace=True)
-            df.set_index('nl_id', inplace=True, verify_integrity=True)
+            df.set_index("nl_id", inplace=True, verify_integrity=True)
+            df.index.rename("stream_id", inplace=True)
             df.sort_index(inplace=True)
         else:
             # Append nl_id as a new column.
@@ -211,16 +216,14 @@ class NlXdf(Xdf):
         data = super()._parse_channel_info(data, **kwargs)
         if data is not None:
             for df in data.values():
-                df['type'] = df['type'].str.lower()
+                df["type"] = df["type"].str.lower()
                 # For AntNeuro App which doesn't include channel labels.
-                if 'index' in df and 'label' not in df:
-                    df['label'] = df['index']
-                df.replace(self.channel_metadata_mapper,
-                           inplace=True)
+                if "index" in df and "label" not in df:
+                    df["label"] = df["index"]
+                df.replace(self.channel_metadata_mapper, inplace=True)
         return data
 
     def _create_nl_ids(self, df):
-
         unique_id_counter = Counter()
 
         def make_nl_id(row, unique_id_counter, hostname_map):
@@ -228,70 +231,70 @@ class NlXdf(Xdf):
             nl_id = str(row.name)
 
             # EEG devices.
-            if row['type'].lower() == 'eeg':
-                if row['hostname'] in hostname_map:
+            if row["type"].lower() == "eeg":
+                if row["hostname"] in hostname_map:
                     # Map tablet hostname to eeg-* labels.
-                    nl_id = hostname_map[row['hostname']]
+                    nl_id = hostname_map[row["hostname"]]
                 else:
                     # Unknown EEG device.
-                    nl_id = 'eeg-?'
+                    nl_id = "eeg-?"
 
             # Eye tracking.
-            elif row['name'].lower().startswith('pupil'):
+            elif row["name"].lower().startswith("pupil"):
                 # Map Pupil Labs device/streams.
-                if row['type'].lower() == 'event':
-                    nl_id = f'pl-{row["source_id"]}-event'
-                elif row['type'].lower() == 'gaze':
-                    nl_id = f'pl-{row["source_id"]}-gaze'
+                if row["type"].lower() == "event":
+                    nl_id = f"pl-{row['source_id']}-event"
+                elif row["type"].lower() == "gaze":
+                    nl_id = f"pl-{row['source_id']}-gaze"
 
             # Marker streams.
-            elif row['name'] == 'TABARNAK V3':
-                nl_id = 'marker-ts'
-            elif row['name'] == 'TimestampStream':
-                nl_id = 'marker-ts'
-            elif row['name'] == 'CameraRecordingTime':
-                nl_id = 'marker-video'
-            elif row['name'] == 'audio':
-                nl_id = 'marker-audio'
-            elif row['name'] == 'Keyboard_Marker_Stream':
-                nl_id = 'marker-kb'
-            elif row['name'] == 'FrameNumber_Stream':
-                nl_id = 'marker-video'
+            elif row["name"] == "TABARNAK V3":
+                nl_id = "marker-ts"
+            elif row["name"] == "TimestampStream":
+                nl_id = "marker-ts"
+            elif row["name"] == "CameraRecordingTime":
+                nl_id = "marker-video"
+            elif row["name"] == "audio":
+                nl_id = "marker-audio"
+            elif row["name"] == "Keyboard_Marker_Stream":
+                nl_id = "marker-kb"
+            elif row["name"] == "FrameNumber_Stream":
+                nl_id = "marker-video"
 
             # Simulated sync test streams.
-            elif row['type'] == 'data' and row['name'].startswith('Test'):
-                if row['hostname'] in ['neurolive', 'bobby']:
+            elif row["type"] == "data" and row["name"].startswith("Test"):
+                if row["hostname"] in ["neurolive", "bobby"]:
                     # Sync test running on the LabRecorder host -- the
                     # closest thing we have to a ground truth with
                     # simulated data.
-                    nl_id = 'test-ref'
-                elif row['hostname'] in hostname_map:
+                    nl_id = "test-ref"
+                elif row["hostname"] in hostname_map:
                     # Sync test running on an EEG tablet or known host.
-                    nl_id = f'test-{hostname_map[row["hostname"]]}'
+                    nl_id = f"test-{hostname_map[row['hostname']]}"
                 else:
                     # Sync test running on another device.
-                    nl_id = 'test'
-            elif row['type'] == 'control':
+                    nl_id = "test"
+            elif row["type"] == "control":
                 # Simulated sync test control stream.
-                nl_id = 'test-ctrl'
+                nl_id = "test-ctrl"
 
             # Generic mappings.
-            elif row['type'].lower() == 'markers':
+            elif row["type"].lower() == "markers":
                 # Catch-all marker stream mapper.
-                nl_id = 'marker-' + nl_id
-            elif row['name'].startswith('_relay_'):
+                nl_id = "marker-" + nl_id
+            elif row["name"].startswith("_relay_"):
                 # Catch-all relayed streams.
-                nl_id = 'relay-' + nl_id
+                nl_id = "relay-" + nl_id
 
             # Automatically increment ID for duplicate stream IDs.
             unique_id_counter.update([nl_id])
             if unique_id_counter[nl_id] > 1:
-                nl_id = f'{nl_id}-{unique_id_counter[nl_id]}'
+                nl_id = f"{nl_id}-{unique_id_counter[nl_id]}"
             return nl_id
 
         nl_ids = df.apply(
             make_nl_id,
-            axis='columns',
+            axis="columns",
             unique_id_counter=unique_id_counter,
             hostname_map=self.hostname_device_mapper,
         )
@@ -301,12 +304,13 @@ class NlXdf(Xdf):
         if data is None:
             return data
         if isinstance(data, list):
-            data = [self._stream_id_to_nl_id(stream_id)
-                    for stream_id in data]
+            data = [self._stream_id_to_nl_id(stream_id) for stream_id in data]
             data.sort()
         elif isinstance(data, dict):
-            data = {self._stream_id_to_nl_id(stream_id): df
-                    for stream_id, df in data.items()}
+            data = {
+                self._stream_id_to_nl_id(stream_id): df
+                for stream_id, df in data.items()
+            }
             data = dict(sorted(data.items()))
         elif isinstance(data, pd.DataFrame):
             data.rename(index=self._stream_id_to_nl_id, inplace=True)
@@ -314,9 +318,7 @@ class NlXdf(Xdf):
         return data
 
     def _stream_id_to_nl_id(self, stream_id):
-        nl_id = self._info.index[
-            self._info['stream_id'] == stream_id
-        ][0]
+        nl_id = self._info.index[self._info["stream_id"] == stream_id][0]
         return nl_id
 
     def plot_time_stamps(
@@ -358,9 +360,11 @@ class NlXdf(Xdf):
                             s=500,
                             color=plt.cm.tab20.colors[7],
                             alpha=0.8,
-                            label='non-monotonic',
+                            label="non-monotonic",
                         )
-                ts.to_frame().plot.scatter("time_stamp", "time_stamp", ax=ax, label=stream_id, s=1)
+                ts.to_frame().plot.scatter(
+                    "time_stamp", "time_stamp", ax=ax, label=stream_id, s=1
+                )
                 ax.legend(bbox_to_anchor=(1, 1), loc=2)
             title = format_title(title, ts)
             axes[0].set_title(title)

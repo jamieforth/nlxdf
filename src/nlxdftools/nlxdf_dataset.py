@@ -1,5 +1,6 @@
 """Class for working with sets of Neurolive/AntNeuro XDF data files."""
 
+from collections import namedtuple
 from collections.abc import Mapping
 
 import numpy as np
@@ -7,14 +8,20 @@ import pandas as pd
 
 from nlxdftools import NlXdf, plotting
 
+SegmentInfo = namedtuple(
+    "SegmentInfo", ["segment_counts", "segment_size", "clock_segment_size"]
+)
+
 
 class NlXdfDataset(Mapping):
     """Class for working with sets of Neurolive/AntNeuro XDF data files."""
 
     def __init__(self, xdf_data_paths, verbose=False):
         """Dataset is a dictionary of {label, nlxdf} pairs."""
-        self.dataset = {key: NlXdf(xdf_data_path, verbose)
-                        for key, xdf_data_path in xdf_data_paths.items()}
+        self.dataset = {
+            key: NlXdf(xdf_data_path, verbose)
+            for key, xdf_data_path in xdf_data_paths.items()
+        }
 
     def __getitem__(self, key):
         """Get XDF file from dataset."""
@@ -34,8 +41,8 @@ class NlXdfDataset(Mapping):
         for recording, nlxdf in self.items():
             streams = nlxdf.resolve_streams()
             data[recording] = len(streams.index)
-        df = pd.DataFrame(data, index=['num device']).T
-        df.index.rename('recording', inplace=True)
+        df = pd.DataFrame(data, index=["num device"]).T
+        df.index.rename("recording", inplace=True)
         return df
 
     def stream_ids(self):
@@ -85,26 +92,30 @@ class NlXdfDataset(Mapping):
         data = {}
         for recording, nlxdf in self.items():
             streams = nlxdf.resolve_streams()
-            data[recording] = streams.loc[:, 'type'].value_counts()
+            data[recording] = streams.loc[:, "type"].value_counts()
         df = pd.DataFrame(data).T
-        df.index.rename('recording', inplace=True)
+        df.index.rename("recording", inplace=True)
         df.replace(np.nan, 0, inplace=True)
         return df
 
     def segment_info(self, *select_streams, **kwargs):
         """Summarise loaded segment data across recordings."""
-        data = {}
+        seg_counts = {}
+        seg_size = {}
+        clock_seg_size = {}
         for recording, nlxdf in self.items():
-            try:
-                nlxdf.load(*select_streams, **kwargs)
-            except ValueError as exc:
-                print(exc)
-                continue
-            data[recording] = nlxdf.segment_info()
+            nlxdf.load(*select_streams, **kwargs)
+            seg_counts[recording] = nlxdf.segment_counts()
+            seg_size[recording] = nlxdf.segment_size()
+            clock_seg_size[recording] = nlxdf.clock_segment_size()
             nlxdf.unload()
-        df = pd.concat(data)
-        df.index.rename('recording', level=0, inplace=True)
-        return df
+        seg_counts = pd.concat(seg_counts)
+        seg_counts.index.rename("recording", level=0, inplace=True)
+        seg_size = pd.concat(seg_size)
+        seg_size.index.rename("recording", level=0, inplace=True)
+        clock_seg_size = pd.concat(clock_seg_size)
+        clock_seg_size.index.rename("recording", level=0, inplace=True)
+        return SegmentInfo(seg_counts, seg_size, clock_seg_size)
 
     def count_channels_per_type(self):
         """Return number of channels per type per device for each XDF file."""
@@ -119,11 +130,7 @@ class NlXdfDataset(Mapping):
         """Check all devices have expected channels across recordings."""
         data = {}
         for recording, nlxdf in self.items():
-            try:
-                nlxdf.load(*select_streams, **kwargs)
-            except ValueError as exc:
-                print(exc)
-                continue
+            nlxdf.load(*select_streams, **kwargs)
             different = nlxdf.check_channels(expected)
             if different is None:
                 print(f"{recording} channels correct")
@@ -131,18 +138,14 @@ class NlXdfDataset(Mapping):
                 data[recording] = different
             nlxdf.unload()
         df = pd.concat(data)
-        df.index.rename('recording', level=0, inplace=True)
+        df.index.rename("recording", level=0, inplace=True)
         return df
 
     def time_stamp_info(self, *select_streams, exclude=[], min_segment=0, **kwargs):
         """Summarise loaded time-stamp data across recordings."""
         data = {}
         for recording, nlxdf in self.items():
-            try:
-                nlxdf.load(*select_streams, **kwargs)
-            except ValueError as exc:
-                print(exc)
-                continue
+            nlxdf.load(*select_streams, **kwargs)
             data[recording] = nlxdf.time_stamp_info(
                 exclude=exclude, min_segment=min_segment
             )
@@ -159,27 +162,23 @@ class NlXdfDataset(Mapping):
     def max_sample_count_diff(self, *select_streams, **kwargs):
         """Compute maximum sample count difference across recordings."""
         df = self.time_stamp_info(*select_streams, **kwargs)
-        max_samples = df['sample_count'].groupby(level=0, sort=False).max()
-        min_samples = df['sample_count'].groupby(level=0, sort=False).min()
+        max_samples = df["sample_count"].groupby(level=0, sort=False).max()
+        min_samples = df["sample_count"].groupby(level=0, sort=False).min()
         count_diff = max_samples - min_samples
-        count_diff.name = 'max_sample_count_diff'
+        count_diff.name = "max_sample_count_diff"
         return count_diff
 
     def time_stamp_intervals(
         self, *select_streams, exclude=[], min_segment=0, **kwargs
     ):
+        # FIXME: Bad idea for big datasets.
         """Return time-stamp intervals across recordings."""
         data = {}
         for recording, nlxdf in self.items():
-            try:
-                nlxdf.load(*select_streams, **kwargs)
-            except ValueError as exc:
-                print(exc)
-                continue
+            nlxdf.load(*select_streams, **kwargs)
             intervals = nlxdf.time_stamp_intervals(
                 exclude=exclude,
                 min_segment=min_segment,
-                concat=True,
             )
             if intervals is not None:
                 data[recording] = intervals
