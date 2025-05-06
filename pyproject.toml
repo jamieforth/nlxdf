@@ -16,6 +16,9 @@ dependencies = [
     "pdxdf",
 ]
 
+[project.scripts]
+snakeskin-resample = "nlxdftools.snakeskin:main"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
