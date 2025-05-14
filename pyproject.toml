@@ -18,6 +18,7 @@ dependencies = [
 
 [project.scripts]
 snakeskin-resample = "nlxdftools.snakeskin:main"
+readings-resample = "nlxdftools.readings:main"
 
 [build-system]
 requires = ["hatchling"]
