@@ -94,7 +94,7 @@ def markers_to_csv(markers):
     # Mirko's markers
     mirko = markers["marker-ts"]
     mirko = mirko[0].str.extract(r"^T:(.*)_M:(.*)")
-    mirko.columns = ["unixtime", "type"]
+    mirko.columns = ["unix_time", "type"]
 
     if len(markers) == 1:
         # Screening
@@ -104,19 +104,20 @@ def markers_to_csv(markers):
         return csv
 
     # Audio
-    audio = markers["marker-audio"].copy()
-    audio.columns = ["type"]
+    audio = markers["marker-audio"]
+    audio = audio.rename(columns={0: "type"})
 
     # Video: Select only one of the duplicate columns.
-    video = markers["marker-video"][[0]].copy()
-    video.columns = ["type"]
+    video = markers["marker-video"][[0]]
+    video = video.rename(columns={0: "type"})
 
     csv = {
         "marker-ts": mirko,
         "marker-audio": audio,
-        "marker-video": video
+        "marker-video": video,
     }
     return csv
+
 
 def markers_to_matlab(markers):
     """Matlab style event file."""
@@ -124,8 +125,8 @@ def markers_to_matlab(markers):
     # Mirko's markers
     mirko = markers["marker-ts"]
     mirko = mirko[0].str.extract(r"^T:(.*)_M:(.*)")
-    mirko.columns = ["unixtime", "type"]
-    mirko = pd.DataFrame({"type": mirko["type"], "values": mirko["unixtime"]})
+    mirko.columns = ["unix_time", "type"]
+    mirko = pd.DataFrame({"type": mirko["type"], "values": mirko["unix_time"]})
     mirko = mirko.rename_axis(index="latency")
 
     if len(markers) == 1:
@@ -136,32 +137,36 @@ def markers_to_matlab(markers):
         return matlab
 
     # Audio
-    audio = markers["marker-audio"].copy()
-    audio.columns = ["type"]
-    audio.rename_axis(index="latency")
+    audio = markers["marker-audio"]
+    audio = audio.rename(columns={0: "type"})
+    audio.rename_axis(index="latency", inplace=True)
     audio["values"] = ""
 
     # Video
-    video = markers["marker-video"][[0]].copy()
-    video.columns = ["type"]
-    video.rename_axis(index="latency")
+    video = markers["marker-video"][[0]]
+    video = video.rename(columns={0: "type"})
+    video.rename_axis(index="latency", inplace=True)
     video["values"] = ""
 
-    matlab = {"marker-ts": mirko, "marker-audio": audio, "marker-video": video}
+    matlab = {
+        "marker-ts": mirko,
+        "marker-audio": audio,
+        "marker-video": video,
+    }
     return matlab
 
 
 def markers_to_annot(markers, orig_time):
-    df = markers["marker-ts"].copy()
+    df = markers["marker-ts"]
 
-    # Extract heartbeats and separate into unixtime and type.
+    # Extract heartbeats and separate into unix_time and type.
     heartbeats = df[0].str.extract(r"^T:(\d*)_M:(H)").dropna()
-    heartbeats.columns = ["unixtime", "type"]
-    heartbeats["type"] = heartbeats["type"] + " T:" + heartbeats["unixtime"]
+    heartbeats.columns = ["unix_time", "type"]
+    heartbeats["type"] = heartbeats["type"] + " T:" + heartbeats["unix_time"]
 
     # Separate timestamps from other message types.
     df = df[0].str.extract(r"^T:(.*)_M:(?!H)(.*)").dropna()
-    df.columns = ["unixtime", "type"]
+    df.columns = ["unix_time", "type"]
     # Don't add heartbeats as annotations.
     # df = pd.concat([heartbeats, df]).sort_index()
     annotations = mne.Annotations(df.index, 0, df.loc[:, "type"], orig_time=orig_time)
