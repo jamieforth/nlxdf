@@ -270,11 +270,23 @@ def main():
         marker_dir.mkdir()
         csv_markers = markers_to_csv(markers)
         for stream_id, marker in csv_markers.items():
-            export_marker_csv(xdf_data_path, marker_dir, stream_id, marker)
+            if stream_id == "marker-ts":
+                comment = "Unix timestamps drift, do not use!"
+            elif stream_id == "marker-video":
+                comment = "Millisecond timestamps drift randomly?"
+            else:
+                comment = None
+            export_marker_csv(xdf_data_path, marker_dir, stream_id, marker, comment)
         # Export markers as matlab TSV
         matlab_markers = markers_to_matlab(markers)
         for stream_id, marker in matlab_markers.items():
-            export_marker_tsv(xdf_data_path, marker_dir, stream_id, marker)
+            if stream_id == "marker-ts":
+                comment = "Unix timestamps drift, do not use!"
+            elif stream_id == "marker-video":
+                comment = "Millisecond timestamps drift randomly?"
+            else:
+                comment = None
+            export_marker_tsv(xdf_data_path, marker_dir, stream_id, marker, comment)
         del xdf
         del raws
         del markers
