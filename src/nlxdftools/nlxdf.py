@@ -216,7 +216,8 @@ class NlXdf(Xdf):
         data = super()._parse_channel_info(data, **kwargs)
         if data is not None:
             for df in data.values():
-                df["type"] = df["type"].str.lower()
+                if "type" in df:
+                    df["type"] = df["type"].str.lower()
                 # For AntNeuro App which doesn't include channel labels.
                 if "index" in df and "label" not in df:
                     df["label"] = df["index"]
