@@ -34,7 +34,7 @@ def export_marker_csv(xdf_data_path, base_dir, stream_id, marker):
 
 
 def export_marker_tsv(xdf_data_path, base_dir, stream_id, marker):
-    tsv_dir = base_dir / "csv"
+    tsv_dir = base_dir / "tsv"
     tsv_dir.mkdir(exist_ok=True)
     marker_file_name = Path(xdf_data_path).stem
     marker_file_name = f"{marker_file_name}-{stream_id}.tsv"
