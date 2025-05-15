@@ -221,11 +221,11 @@ def main():
 
     start_time = datetime.datetime.now()
     label = args.label
-    dest_dir = (
+    batch_dir = (
         f"{start_time.isoformat(timespec='seconds')}{'' if not label else f'-{label}'}"
     )
-    dest_dir = Path(args.o) / dest_dir
-    dest_dir.mkdir()
+    batch_dir = Path(args.o) / batch_dir
+    batch_dir.mkdir()
 
     for xdf_data_path in xdf_data_paths:
         performance = Path(xdf_data_path).parent.stem
@@ -245,8 +245,8 @@ def main():
         else:
             exclude = []
 
-        sub_dir = dest_dir / performance
-        sub_dir.mkdir()
+        perf_dir = batch_dir / performance
+        perf_dir.mkdir()
         xdf = ReadingsXdf(xdf_data_path).load()
         raws, markers = xdf.raw_mne(
             fs_new=args.fs,
@@ -254,11 +254,13 @@ def main():
             exclude=exclude,
         )
         # Export data as SET and FIF.
+        eeg_dir = perf_dir / "eeg"
+        eeg_dir.mkdir()
         for stream_id, raw in raws.items():
-            export_set(xdf_data_path, sub_dir, stream_id, raw)
-            export_fif(xdf_data_path, sub_dir, stream_id, raw)
+            export_fif(xdf_data_path, eeg_dir, stream_id, raw)
+            export_set(xdf_data_path, eeg_dir, stream_id, raw)
         # Export markers as CSV
-        marker_dir = sub_dir / "markers"
+        marker_dir = perf_dir / "markers"
         marker_dir.mkdir()
         csv_markers = markers_to_csv(markers)
         for stream_id, marker in csv_markers.items():
