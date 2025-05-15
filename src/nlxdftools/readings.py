@@ -2,6 +2,7 @@ import argparse
 import datetime
 from pathlib import Path
 
+import git
 import mne
 import pandas as pd
 
@@ -226,8 +227,10 @@ def main():
 
     start_time = datetime.datetime.now()
     label = args.label
+    repo = git.Repo(__file__, search_parent_directories=True)
+    hexsha = repo.head.commit.hexsha[0:8]
     batch_dir = (
-        f"{start_time.isoformat(timespec='seconds')}{'' if not label else f'-{label}'}"
+        f"{start_time.isoformat(timespec='seconds')}{'' if not label else f'-{label}-{hexsha}'}"
     )
     batch_dir = Path(args.o) / batch_dir
     batch_dir.mkdir()
