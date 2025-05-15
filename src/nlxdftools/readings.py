@@ -93,7 +93,7 @@ def markers_to_csv(markers):
 
     # Mirko's markers
     mirko = markers["marker-ts"]
-    mirko = mirko[0].str.extract(r"^T:(.*)_M:(.*)$")
+    mirko = mirko[0].str.extract(r"^T:(.*)_M:(.*)")
     mirko.columns = ["unixtime", "type"]
 
     if len(markers) == 1:
@@ -123,7 +123,7 @@ def markers_to_matlab(markers):
 
     # Mirko's markers
     mirko = markers["marker-ts"]
-    mirko = mirko[0].str.extract(r"^T:(.*)_M:(.*)$")
+    mirko = mirko[0].str.extract(r"^T:(.*)_M:(.*)")
     mirko.columns = ["unixtime", "type"]
     mirko = pd.DataFrame({"type": mirko["type"], "values": mirko["unixtime"]})
     mirko = mirko.rename_axis(index="latency")
@@ -155,12 +155,12 @@ def markers_to_annot(markers, orig_time):
     df = markers["marker-ts"].copy()
 
     # Extract heartbeats and separate into unixtime and type.
-    heartbeats = df[0].str.extract(r"^T:(\d*)_M:(H)$").dropna()
+    heartbeats = df[0].str.extract(r"^T:(\d*)_M:(H)").dropna()
     heartbeats.columns = ["unixtime", "type"]
     heartbeats["type"] = heartbeats["type"] + " T:" + heartbeats["unixtime"]
 
     # Separate timestamps from other message types.
-    df = df[0].str.extract(r"^T:(.*)_M:(?!H)(.*)$").dropna()
+    df = df[0].str.extract(r"^T:(.*)_M:(?!H)(.*)").dropna()
     df.columns = ["unixtime", "type"]
     # Don't add heartbeats as annotations.
     # df = pd.concat([heartbeats, df]).sort_index()
