@@ -229,9 +229,7 @@ def main():
     label = args.label
     repo = git.Repo(__file__, search_parent_directories=True)
     hexsha = repo.head.commit.hexsha[0:8]
-    batch_dir = (
-        f"{start_time.isoformat(timespec='seconds')}{'' if not label else f'-{label}-{hexsha}'}"
-    )
+    batch_dir = f"{start_time.isoformat(timespec='seconds')}{'' if not label else f'-{label}-{hexsha}'}"
     batch_dir = Path(args.o) / batch_dir
     batch_dir.mkdir()
 
