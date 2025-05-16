@@ -407,39 +407,37 @@ class NlXdf(Xdf):
             ):
                 df = pd.concat({stream_id: df}, axis=1)
                 ax = axes[i % len(axes)]
-                for i, (seg_start, seg_end) in zip(range(len(segments)), segments):
+                for (seg_start, seg_end) in segments:
                     # Plot start of segments.
                     if i == 0:
                         ax.axvline(
-                            df.index[seg_start],
+                            df.index.get_level_values("time_stamp")[seg_start],
                             color=plt.cm.tab20.colors[2],
                             alpha=0.5,
                             label="segments",
                         )
                     else:
                         ax.axvline(
-                            df.index[seg_start],
+                            df.index.get_level_values("time_stamp")[seg_start],
                             color=plt.cm.tab20.colors[2],
                             alpha=0.5,
                         )
-                for i, (c_seg_start, c_seg_end) in zip(
-                    range(len(clock_segments)), clock_segments
-                ):
+                for (c_seg_start, c_seg_end) in clock_segments:
                     # Plot end of clock segments.
                     if i == 0:
                         ax.axvline(
-                            df.index[c_seg_end],
+                            df.index.get_level_values("time_stamp")[c_seg_end],
                             color=plt.cm.tab20.colors[6],
                             alpha=0.5,
                             label="clock segments",
                         )
                     else:
                         ax.axvline(
-                            df.index[c_seg_end],
+                            df.index.get_level_values("time_stamp")[c_seg_end],
                             color=plt.cm.tab20.colors[6],
                             alpha=0.5,
                         )
-                df.plot(ax=ax)
+                df.droplevel(["segment", "sample"]).plot(ax=ax)
                 ax.legend(bbox_to_anchor=(1, 1), loc=2)
             title = format_title(title, df)
             axes[0].set_title(title)
@@ -462,23 +460,23 @@ class NlXdf(Xdf):
             exclude=exclude,
             cols=cols,
             with_stream_id=True,
-            as_single_df=True,
+            concat=True,
         )
         with mpl.rc_context(
             {"axes.prop_cycle": plt.cycler("color", plt.cm.tab20.colors)}
         ):
-            ax = df.plot.box(vert=False)
-            ax.invert_yaxis()
+            axes = df.groupby("stream_id").plot.box(vert=False)
             title = format_title(title, df)
-            ax.set_title(title)
-            ax.text(
-                x=1.0,
-                y=1.0,
-                s=format_load_params(df),
-                fontsize=7,
-                transform=ax.transAxes,
-                horizontalalignment="left",
-                verticalalignment="bottom",
-            )
-            ax.set_xlabel("value")
-        return ax
+            for ax in axes:
+                ax.set_title(title)
+                ax.text(
+                    x=1.0,
+                    y=1.0,
+                    s=format_load_params(df),
+                    fontsize=7,
+                    transform=ax.transAxes,
+                    horizontalalignment="left",
+                    verticalalignment="bottom",
+                )
+                ax.set_xlabel("value")
+        return axes
