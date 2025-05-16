@@ -106,7 +106,18 @@ def main():
         performance = Path(xdf_data_path).parent.stem
         perf_dir = batch_dir / performance
         perf_dir.mkdir()
-        xdf = NlXdf(xdf_data_path).load()
+        # Messages recordings.
+        filename = Path(xdf_data_path).name
+        if filename == "messages-1.xdf":
+            xdf = NlXdf(xdf_data_path).load(2, 5, 9)
+        elif filename == "messages-2.xdf":
+            xdf = NlXdf(xdf_data_path).load(2, 5)
+        elif filename == "messages-3.xdf":
+            xdf = NlXdf(xdf_data_path).load(1, 3, 6)
+        else:
+            # Performance recordings.
+            xdf = NlXdf(xdf_data_path).load()
+
         raws, markers = xdf.raw_mne(fs_new=args.fs, annotation_fn=markers_to_annot)
         # Export data as SET and FIF.
         eeg_dir = perf_dir / "eeg"
