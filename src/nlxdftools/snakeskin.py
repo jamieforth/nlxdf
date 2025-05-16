@@ -105,7 +105,7 @@ def main():
     for xdf_data_path in xdf_data_paths:
         performance = Path(xdf_data_path).parent.stem
         perf_dir = batch_dir / performance
-        perf_dir.mkdir()
+        perf_dir.mkdir(exist_ok=True)
         # Messages recordings.
         filename = Path(xdf_data_path).name
         if filename == "messages-1.xdf":
@@ -121,13 +121,13 @@ def main():
         raws, markers = xdf.raw_mne(fs_new=args.fs, annotation_fn=markers_to_annot)
         # Export data as SET and FIF.
         eeg_dir = perf_dir / "eeg"
-        eeg_dir.mkdir()
+        eeg_dir.mkdir(exist_ok=True)
         for stream_id, raw in raws.items():
             export_fif(xdf_data_path, eeg_dir, stream_id, raw)
             export_set(xdf_data_path, eeg_dir, stream_id, raw)
         # Export markers as CSV
         marker_dir = perf_dir / "markers"
-        marker_dir.mkdir()
+        marker_dir.mkdir(exist_ok=True)
         csv_markers = markers_to_csv(markers)
         for stream_id, marker in csv_markers.items():
             export_marker_csv(xdf_data_path, marker_dir, stream_id, marker)
