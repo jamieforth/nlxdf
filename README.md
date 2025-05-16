@@ -42,7 +42,7 @@ uv add --editable ~/some/path/nlxdf-tools
 ``` sh
 snakeskin-resample --help
 
-snakeskin-resample -i .data/performances/4-snakeskin/*/*.xdf \
+snakeskin-resample -i ./data/performances/4-snakeskin/*/*.xdf \
                    -o ./data/performances/4-snakeskin/resampled/ \
                    --fs 512 \
                    --label 'optional text to append to directory name'
@@ -51,8 +51,8 @@ snakeskin-resample -i .data/performances/4-snakeskin/*/*.xdf \
 ``` sh
 readings-resample --help
 
-readings-resample -i .data/performances/5-readings/*/*.xdf \
-                   -o ./data/performances/5-readings/resampled/ \
-                   --fs 512 \
-                   --label 'optional text to append to directory name'
+readings-resample -i ./data/performances/5-readings/*/*.xdf \
+                  -o ./data/performances/5-readings/resampled/ \
+                  --fs 512 \
+                  --label 'optional text to append to directory name'
 ```
