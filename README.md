@@ -36,3 +36,23 @@ git clone https://github.com/jamieforth/nlxdf-tools.git
 cd ~/project/path
 uv add --editable ~/some/path/nlxdf-tools
 ```
+
+## Resampling
+
+``` sh
+snakeskin-resample --help
+
+snakeskin-resample -i .data/performances/4-snakeskin/*/*.xdf \
+                   -o ./data/performances/4-snakeskin/resampled/ \
+                   --fs 512 \
+                   --label 'optional text to append to directory name'
+```
+
+``` sh
+readings-resample --help
+
+readings-resample -i .data/performances/5-readings/*/*.xdf \
+                   -o ./data/performances/5-readings/resampled/ \
+                   --fs 512 \
+                   --label 'optional text to append to directory name'
+```
