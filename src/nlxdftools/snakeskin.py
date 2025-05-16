@@ -118,7 +118,9 @@ def main():
             # Performance recordings.
             xdf = NlXdf(xdf_data_path).load()
 
-        raws, markers = xdf.raw_mne(fs_new=args.fs, annotation_fn=markers_to_annot)
+        raws, markers = xdf.raw_mne(
+            fs_new=args.fs, annotation_fn=markers_to_annot, with_stream_id=True
+        )
         # Export data as SET and FIF.
         eeg_dir = perf_dir / "eeg"
         eeg_dir.mkdir(exist_ok=True)

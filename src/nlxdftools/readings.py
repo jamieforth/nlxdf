@@ -245,6 +245,7 @@ def main():
             fs_new=args.fs,
             annotation_fn=markers_to_annot,
             exclude=exclude,
+            with_stream_id=True,
         )
         # Export data as SET and FIF.
         eeg_dir = perf_dir / "eeg"
