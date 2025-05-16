@@ -210,7 +210,8 @@ def main():
     args = parser.parse_args()
 
     xdf_data_paths = [Path(path) for path in args.i]
-    print(xdf_data_paths)
+    for path in xdf_data_paths:
+        print(path, flush=True)
 
     start_time = datetime.datetime.now()
     label = args.label
