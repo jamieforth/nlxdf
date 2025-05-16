@@ -8,6 +8,7 @@ import pandas as pd
 
 from nlxdftools import NlXdf
 from nlxdftools.export import (
+    check_markers,
     export_fif,
     export_marker_csv,
     export_marker_tsv,
@@ -21,9 +22,9 @@ def markers_to_csv(markers):
     # Mirko's markers
     mirko = markers["marker-ts"]
     # Keep only type and unix_time (nanoseconds).
-    mirko = mirko[0].str.extract(r"(^.*) [Tt]:(\d*)")
+    mirko = mirko[0].str.extract(r"(^.*)[ _][Tt]:(\d*)").dropna()
     mirko = pd.DataFrame({"type": mirko[0], "unix_time": mirko[1]})
-
+    check_markers(len(markers["marker-ts"]), len(mirko))
     csv = {
         "marker-ts": mirko,
     }
@@ -35,10 +36,10 @@ def markers_to_matlab(markers):
     # Mirko's markers
     mirko = markers["marker-ts"]
     # Keep only type and unix_time (nanoseconds).
-    mirko = mirko[0].str.extract(r"(^.*) [Tt]:(\d*)")
+    mirko = mirko[0].str.extract(r"(^.*)[ _][Tt]:(\d*)").dropna()
     mirko.columns = ["type", "unix_time"]
     mirko = mirko.rename_axis(index="latency")
-
+    check_markers(len(markers["marker-ts"]), len(mirko))
     matlab = {
         "marker-ts": mirko,
     }
@@ -49,16 +50,13 @@ def markers_to_annot(markers, orig_time):
     df = markers["marker-ts"]
 
     # Extract heartbeats - don't include as annotations.
-    heartbeats = df[0].str.extract(r"^(H) T:(\d*)").dropna()
+    heartbeats = df[0].str.extract(r"^(H)[ _][Tt]:(\d*)").dropna()
     heartbeats.columns = ["type", "unix_time"]
 
     # Separate timestamps from other message types.
-    df = df[0].str.extract(r"(?!H )^(.*) T:(\d*)").dropna()
+    df = df[0].str.extract(r"(?!H[ _])^(.*)[ _][Tt]:(\d*)").dropna()
+    check_markers(len(markers["marker-ts"]), len(heartbeats) + len(df))
     annotations = mne.Annotations(df.index, 0, df.iloc[:, 0], orig_time=orig_time)
-    n_original_markers = len(markers["marker-ts"])
-    n_parsed_markers = len(heartbeats) + len(df)
-    if n_original_markers != n_parsed_markers:
-        raise ValueError(f"Dropped {n_original_markers - n_parsed_markers} markers!")
     return annotations
 
 

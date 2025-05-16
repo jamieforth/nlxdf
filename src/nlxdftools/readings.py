@@ -8,6 +8,7 @@ import pandas as pd
 
 from nlxdftools import NlXdf
 from nlxdftools.export import (
+    check_markers,
     export_fif,
     export_marker_csv,
     export_marker_tsv,
@@ -102,9 +103,10 @@ def markers_to_csv(markers):
     # Mirko's markers
     if "marker-ts" in markers:
         mirko = markers["marker-ts"]
-        mirko = mirko[0].str.extract(r"^T:(.*)_M:(.*)")
+        mirko = mirko[0].str.extract(r"^T:(\d*)_M:(\w*)").dropna()
         mirko.columns = ["unix_time", "type"]
         mirko = pd.DataFrame({"type": mirko["type"], "unix_time": mirko["unix_time"]})
+        check_markers(len(markers["marker-ts"]), len(mirko))
         csv["marker-ts"] = mirko
 
     # Audio
@@ -127,10 +129,11 @@ def markers_to_matlab(markers):
     # Mirko's markers
     if "marker-ts" in markers:
         mirko = markers["marker-ts"]
-        mirko = mirko[0].str.extract(r"^T:(.*)_M:(.*)")
+        mirko = mirko[0].str.extract(r"^T:(\d*)_M:(\w*)").dropna()
         mirko.columns = ["unix_time", "type"]
         mirko = pd.DataFrame({"type": mirko["type"], "unix_time": mirko["unix_time"]})
         mirko = mirko.rename_axis(index="latency")
+        check_markers(len(markers["marker-ts"]), len(mirko))
         matlab["marker-ts"] = mirko
 
     # Audio
@@ -156,13 +159,10 @@ def markers_to_annot(markers, orig_time):
     heartbeats.columns = ["unix_time", "type"]
 
     # Separate timestamps from other message types.
-    df = df[0].str.extract(r"^T:(.*)_M:(?!H)(.*)").dropna()
+    df = df[0].str.extract(r"^T:(\d*)_M:(?!H)(\w*)").dropna()
     df.columns = ["unix_time", "type"]
+    check_markers(len(markers["marker-ts"]), len(heartbeats) + len(df))
     annotations = mne.Annotations(df.index, 0, df.loc[:, "type"], orig_time=orig_time)
-    n_original_markers = len(markers["marker-ts"])
-    n_parsed_markers = len(heartbeats) + len(df)
-    if n_original_markers != n_parsed_markers:
-        raise ValueError(f"Dropped {n_original_markers - n_parsed_markers} markers!")
 
     # Audio
     if "marker-audio" in markers:

@@ -53,3 +53,8 @@ def export_marker_tsv(xdf_data_path, base_dir, stream_id, marker, comment=None):
                 comment = "# " + comment
             csvfile.write(comment + "\n")
         marker.to_csv(csvfile, sep="\t")
+
+
+def check_markers(n_orig, n_parsed):
+    if n_orig != n_parsed:
+        raise ValueError(f"Dropped {n_orig - n_parsed} markers!")
