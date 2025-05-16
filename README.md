@@ -1,10 +1,10 @@
 # nlxdf-tools
 
 This adds custom NEUROLIVE features for processing XDF files using
-pyxdf-tools.
+[pdxdf](https://github.com/jamieforth/pdxdf).
 
 This package is installed automatically by
-[nl-analysis](http://github.com/jamieforth/nl-analysis.git).
+[nl-analysis](http://github.com/jamieforth/nl-analysis.git) (private).
 
 To use this package as part of other projects, or to install it within
 a `venv` you are managing your yourself, install with `pip` or via
