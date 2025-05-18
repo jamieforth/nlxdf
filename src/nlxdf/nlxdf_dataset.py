@@ -1,4 +1,4 @@
-"""Class for working with sets of Neurolive/AntNeuro XDF data files."""
+"""Class for processing sets of Neurolive XDF data files."""
 
 from collections import namedtuple
 from collections.abc import Mapping
@@ -6,7 +6,7 @@ from collections.abc import Mapping
 import numpy as np
 import pandas as pd
 
-from nlxdftools import NlXdf, plotting
+from nlxdf import NlXdf, plotting
 
 SegmentInfo = namedtuple(
     "SegmentInfo", ["segment_counts", "segment_size", "clock_segment_size"]
@@ -14,7 +14,7 @@ SegmentInfo = namedtuple(
 
 
 class NlXdfDataset(Mapping):
-    """Class for working with sets of Neurolive/AntNeuro XDF data files."""
+    """Class for processing sets of Neurolive XDF data files."""
 
     def __init__(self, xdf_data_paths, verbose=False):
         """Dataset is a dictionary of {label, nlxdf} pairs."""

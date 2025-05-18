@@ -1,7 +1,7 @@
 [project]
-name = "nlxdftools"
-version = "0.0.1"
-description = "Tools for working with NEUROLIVE XDF data files."
+name = "nlxdf"
+version = "0.1.0"
+description = "NEUROLIVE XDF data file processing."
 readme = "README.md"
 authors = [
     {name="Jamie Forth", email="j.forth@gold.ac.uk"},
@@ -10,16 +10,18 @@ license = {text = "AGPL-3.0-or-later"}
 requires-python = ">=3.11"
 
 dependencies = [
-    "pandas[performance]>=2.2.3",
-    "matplotlib>=3.9.2",
-    "scipy>=1.15.2",
-    "pdxdf",
+    "eeglabio>=0.0.3",
     "gitpython>=3.1.44",
+    "matplotlib>=3.9.2",
+    "mne>=1.9.0",
+    "pandas[performance]>=2.2.3",
+    "pdxdf",
+    "scipy>=1.15.2",
 ]
 
 [project.scripts]
-snakeskin-resample = "nlxdftools.snakeskin:main"
-readings-resample = "nlxdftools.readings:main"
+snakeskin-resample = "nlxdf.snakeskin:main"
+readings-resample = "nlxdf.readings:main"
 
 [build-system]
 requires = ["hatchling"]

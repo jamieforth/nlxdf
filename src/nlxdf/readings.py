@@ -6,8 +6,8 @@ import git
 import mne
 import pandas as pd
 
-from nlxdftools import NlXdf
-from nlxdftools.export import (
+from nlxdf import NlXdf
+from nlxdf.export import (
     check_markers,
     export_fif,
     export_marker_csv,
@@ -219,7 +219,7 @@ def main():
     hexsha = repo.head.commit.hexsha[0:8]
     batch_dir = f"{start_time.isoformat(timespec='seconds')}{'' if not label else f'-{label}-{hexsha}'}"
     batch_dir = Path(args.o) / batch_dir
-    batch_dir.mkdir()
+    batch_dir.mkdir(parents=True)
 
     for xdf_data_path in xdf_data_paths:
         performance = Path(xdf_data_path).parent.stem
@@ -241,7 +241,17 @@ def main():
 
         perf_dir = batch_dir / performance
         perf_dir.mkdir()
+
+        # Resampling takes the earliest time-stamp across all loaded streams as
+        # the basis for alignment. Therefore, we must load all streams we want
+        # to resample into RAM. This is usually fine, but could be serialised
+        # to support situations where RAM is limited.
         xdf = ReadingsXdf(xdf_data_path).load()
+
+        # This resamples all streams in RAM before writing each to file. This
+        # could be serialised by looping over data stream_ids here (passing in
+        # marker stream_ids) and writing each data stream to file incrementally
+        # (marker streams would only need writing once).
         raws, markers = xdf.raw_mne(
             fs_new=args.fs,
             annotation_fn=markers_to_annot,

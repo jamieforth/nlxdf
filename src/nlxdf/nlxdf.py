@@ -1,4 +1,4 @@
-"""Class for working with Neurolive/AntNeuro XDF data files."""
+"""Main NlXdf class for processing Neurolive XDF data."""
 
 from collections import Counter
 
@@ -8,14 +8,14 @@ import pandas as pd
 from pdxdf import Xdf
 from pdxdf.errors import NoLoadableStreamsError, XdfAlreadyLoadedError
 
-from nlxdftools.plotting import format_load_params, format_title
+from nlxdf.plotting import format_load_params, format_title
 
 
 class NlXdf(Xdf):
-    """Class for working with individual Neurolive/AntNeuro XDF data files.
+    """Main class for processing Neurolive XDF data.
 
-    Provides a pandas-based layer of abstraction over raw XDF data to simplify
-    data processing.
+    Provides a pandas-based layer of abstraction over raw XDF data with
+    customised Neurolive-specific pre-processing.
     """
 
     hostname_device_mapper = {
