@@ -390,7 +390,7 @@ class NlXdf(Xdf):
             n = len(data)
             if n > 1 and subplots:
                 fig, axes = plt.subplots(
-                    n, figsize=(10, 4 * (0.5 * n)), sharex=True, sharey=True
+                    n, figsize=(6.4, 4.8 * (0.5 * n)), sharex=True, sharey=True
                 )
             else:
                 fig, ax = plt.subplots(1)
@@ -409,7 +409,7 @@ class NlXdf(Xdf):
                 ax = axes[i % len(axes)]
                 for (seg_start, seg_end) in segments:
                     # Plot start of segments.
-                    if i == 0:
+                    if subplots or i == 0:
                         ax.axvline(
                             df.index.get_level_values("time_stamp")[seg_start],
                             color=plt.cm.tab20.colors[2],
@@ -424,7 +424,7 @@ class NlXdf(Xdf):
                         )
                 for (c_seg_start, c_seg_end) in clock_segments:
                     # Plot end of clock segments.
-                    if i == 0:
+                    if subplots or i == 0:
                         ax.axvline(
                             df.index.get_level_values("time_stamp")[c_seg_end],
                             color=plt.cm.tab20.colors[6],
