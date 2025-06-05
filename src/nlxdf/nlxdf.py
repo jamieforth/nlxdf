@@ -392,7 +392,7 @@ class NlXdf(Xdf):
         height=0.5,
         reset_timestamps=False,
         legend=True,
-        show_segments=True
+        show_segments=True,
     ):
         data = self.data(*stream_ids, exclude=exclude, cols=cols, with_stream_id=True)
         with mpl.rc_context(
@@ -423,36 +423,32 @@ class NlXdf(Xdf):
                 df = pd.concat({stream_id: df}, axis=1)
                 ax = axes[i % len(axes)]
                 if show_segments:
-                    for seg_start, seg_end in segments:
-                        # Plot start of segments.
-                        if subplots or i == 0:
-                            ax.axvline(
-                                df.index.get_level_values("time_stamp")[seg_start],
-                                color=plt.cm.tab20.colors[2],
-                                alpha=0.5,
-                                label="segments",
-                            )
-                        else:
-                            ax.axvline(
-                                df.index.get_level_values("time_stamp")[seg_start],
-                                color=plt.cm.tab20.colors[2],
-                                alpha=0.5,
-                            )
-                    for c_seg_start, c_seg_end in clock_segments:
-                        # Plot end of clock segments.
-                        if subplots or i == 0:
-                            ax.axvline(
-                                df.index.get_level_values("time_stamp")[c_seg_end],
-                                color=plt.cm.tab20.colors[6],
-                                alpha=0.5,
-                                label="clock segments",
-                            )
-                        else:
-                            ax.axvline(
-                                df.index.get_level_values("time_stamp")[c_seg_end],
-                                color=plt.cm.tab20.colors[6],
-                                alpha=0.5,
-                            )
+                    seg_starts = [
+                        df.index.get_level_values("time_stamp")[seg_start]
+                        for (seg_start, seg_end) in segments
+                    ]
+                    ax.vlines(
+                        seg_starts,
+                        1,
+                        0.95,
+                        transform=ax.get_xaxis_transform(),
+                        alpha=0.5,
+                        colors=plt.cm.tab20.colors[2],
+                        label="segments",
+                    )
+                    c_seg_starts = [
+                        df.index.get_level_values("time_stamp")[c_seg_start]
+                        for (c_seg_start, c_seg_end) in clock_segments
+                    ]
+                    ax.vlines(
+                        c_seg_starts,
+                        0,
+                        0.05,
+                        transform=ax.get_xaxis_transform(),
+                        alpha=0.5,
+                        colors=plt.cm.tab20.colors[6],
+                        label="clock segments",
+                    )
                 df.droplevel(["segment", "sample"]).plot(ax=ax, legend=legend)
                 if legend:
                     ax.legend(bbox_to_anchor=(1, 1), loc=2)

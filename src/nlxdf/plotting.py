@@ -29,7 +29,7 @@ def format_load_params(df):
             [
                 f"{k}={v}"
                 for (k, v) in df.attrs["load_params"].items()
-                if k != "select_streams"
+                if k not in ["select_streams"]
             ]
         )
         return params
