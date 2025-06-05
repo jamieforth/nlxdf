@@ -2,6 +2,7 @@ import textwrap
 
 import matplotlib.pyplot as plt
 import numpy as np
+from pyxdf.pyxdf import _robust_fit
 
 
 # Plotting
@@ -169,22 +170,62 @@ def plot_first_time_stamps_dist_df(df, units="seconds"):
     return ax
 
 
-def plot_clock_offsets(data, normalise=False):
+def plot_clock_offsets(data, title=None, normalise=True, sync=True, cols=2):
+    if not isinstance(data, dict):
+        raise ValueError("Data must be dictionary {stream_id: DataFrame}")
     n = len(data)
-    cols = 2
+    if n > 1:
+        cols = cols
+    else:
+        cols = 1
     rows = np.ceil(n / cols).astype(int)
     fig, axes = plt.subplots(
-        rows, cols, sharex=False, sharey=False, figsize=(6 + cols, 4 + rows)
+        rows, cols, sharex=normalise, sharey=normalise, figsize=(6 + cols, 4 + rows)
     )
-    axes = axes.ravel()
+    if n > 1:
+        axes = axes.ravel()
+    else:
+        axes = [axes]
     for (stream_id, offsets), i in zip(data.items(), range(0, n)):
         if normalise:
+            offsets = offsets.copy()
             offsets["time"] = offsets["time"] - offsets["time"].median()
             offsets["value"] = offsets["value"] - offsets["value"].median()
+        if sync:
+            intercept, slope = clock_offset_sync(offsets)
         offsets = offsets.set_index("time")
         offsets.plot(ax=axes[i], legend=None)
+        if sync:
+            axes[i].plot(offsets.index, offsets.index * slope + intercept)
         axes[i].set_title(stream_id)
-    title = "Clock offsets per stream"
+        axes[i].set_xlabel("time (s)")
+        axes[i].set_ylabel("offset (s)")
+    if normalise:
+        base_title = "Normalised clock offsets per stream"
+    else:
+        base_title = "Clock offsets per stream"
+    if sync:
+        base_title = base_title + " (+sync regression)"
+    if title is not None:
+        title = f"{base_title}\n{title}"
+    else:
+        title = base_title
     fig.suptitle(title)
     fig.tight_layout()
     return axes
+
+
+def clock_offset_sync(offsets):
+    winsor_threshold = 0.0001
+
+    X = np.column_stack(
+        [
+            np.ones(len(offsets)),
+            np.array(offsets["time"]) / winsor_threshold,
+        ]
+    )
+    y = np.array(offsets["value"]) / winsor_threshold
+
+    _coefs = _robust_fit(X, y)
+    _coefs[0] *= winsor_threshold
+    return _coefs
