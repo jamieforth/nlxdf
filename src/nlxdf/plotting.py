@@ -170,7 +170,16 @@ def plot_first_time_stamps_dist_df(df, units="seconds"):
     return ax
 
 
-def plot_clock_offsets(data, title=None, normalise=True, sync=True, cols=2):
+def plot_clock_offsets(
+    data,
+    title=None,
+    normalise=True,
+    sync=True,
+    cols=2,
+    units="s",
+    ylim=None,
+    legend=False,
+):
     if not isinstance(data, dict):
         raise ValueError("Data must be dictionary {stream_id: DataFrame}")
     n = len(data)
@@ -191,15 +200,20 @@ def plot_clock_offsets(data, title=None, normalise=True, sync=True, cols=2):
             offsets = offsets.copy()
             offsets["time"] = offsets["time"] - offsets["time"].median()
             offsets["value"] = offsets["value"] - offsets["value"].median()
+        offsets["value"] = scale_seconds(offsets["value"], units)
         if sync:
             intercept, slope = clock_offset_sync(offsets)
         offsets = offsets.set_index("time")
         offsets.plot(ax=axes[i], legend=None)
+        if ylim is not None:
+            axes[i].set_ylim(ylim)
         if sync:
-            axes[i].plot(offsets.index, offsets.index * slope + intercept)
+            axes[i].plot(offsets.index, offsets.index * slope + intercept, label="sync")
+        if legend:
+            axes[i].legend()
         axes[i].set_title(stream_id)
         axes[i].set_xlabel("time (s)")
-        axes[i].set_ylabel("offset (s)")
+        axes[i].set_ylabel(f"offset ({units})")
     if normalise:
         base_title = "Normalised clock offsets per stream"
     else:
