@@ -139,6 +139,7 @@ class NlXdf(Xdf):
         dejitter_timestamps=True,
         handle_clock_resets=True,
         handle_non_monotonic="trust_timeseries",
+        nl_id_as_index=True,
         **kwargs,
     ):
         """Load XDF data from file using pyxdf.load_xdf().
@@ -150,6 +151,7 @@ class NlXdf(Xdf):
                 *select_streams,
                 channel_scale_field=channel_scale_field,
                 channel_name_field=channel_name_field,
+                nl_id_as_index=nl_id_as_index,
                 synchronize_clocks=synchronize_clocks,
                 dejitter_timestamps=dejitter_timestamps,
                 handle_clock_resets=handle_clock_resets,
@@ -160,16 +162,17 @@ class NlXdf(Xdf):
             print(exc)
             return self
 
-        # Map stream-IDs to neurolive IDs.
-        self._loaded_stream_ids = self._map_stream_ids(self.loaded_stream_ids)
-        self._desc = self._map_stream_ids(self._desc)
-        self._segments = self._map_stream_ids(self._segments)
-        self._clock_segments = self._map_stream_ids(self._clock_segments)
-        self._channel_info = self._map_stream_ids(self._channel_info)
-        self._footer = self._map_stream_ids(self._footer)
-        self._clock_offsets = self._map_stream_ids(self._clock_offsets)
-        self._time_series = self._map_stream_ids(self._time_series)
-        self._time_stamps = self._map_stream_ids(self._time_stamps)
+        if nl_id_as_index:
+            # Map stream-IDs to neurolive IDs.
+            self._loaded_stream_ids = self._map_stream_ids(self.loaded_stream_ids)
+            self._desc = self._map_stream_ids(self._desc)
+            self._segments = self._map_stream_ids(self._segments)
+            self._clock_segments = self._map_stream_ids(self._clock_segments)
+            self._channel_info = self._map_stream_ids(self._channel_info)
+            self._footer = self._map_stream_ids(self._footer)
+            self._clock_offsets = self._map_stream_ids(self._clock_offsets)
+            self._time_series = self._map_stream_ids(self._time_series)
+            self._time_stamps = self._map_stream_ids(self._time_stamps)
 
         return self
 
