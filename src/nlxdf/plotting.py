@@ -7,17 +7,17 @@ from pyxdf.pyxdf import _robust_fit
 
 # Plotting
 def scale_seconds(df, units="seconds"):
-    if units == "seconds":
+    if units in ["seconds", "s"]:
         return df
-    if units == "hours":
+    if units in ["hours", "h"]:
         return df / 60 / 60
-    if units == "minutes":
+    if units in ["minutes", "m"]:
         return df / 60
-    if units == "milliseconds":
+    if units in ["milliseconds", "ms"]:
         return df * 1000
-    if units == "microseconds":
+    if units in ["microseconds", "us", "µs"]:
         return df * 1e6
-    if units == "nanoseconds":
+    if units in ["nanoseconds", "ns"]:
         return df * 1e9
     print(f"Unknown units {units}")
     return None
